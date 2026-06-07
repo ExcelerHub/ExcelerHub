@@ -156,5 +156,3 @@ To build a unified platform that simplifies internship and learning management f
 ExcelerHub Internship Project
 
 Built as part of internship deliverables using Flutter.
-
---- this is the readme tell wht to do in this?
