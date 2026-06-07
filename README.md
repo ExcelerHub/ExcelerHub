@@ -95,7 +95,7 @@ The application design includes wireframes for:
 ## 🎨 Wireframes
 
 Figma Wireframe Link:
-https://www.figma.com/make/HB3Evrxa8NDcKwhu8OtX0A/Low-Fidelity-Mobile-Wireframes
+https://www.figma.com/make/HB3Evrxa8NDcKwhu8OtX0A/Low-Fidelity-Mobile-Wireframes?code-node-id=0-9&p=f&fullscreen=1
 
 ---
 ## 📊 Project Status
