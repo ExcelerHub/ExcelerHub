@@ -34,7 +34,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> with SingleTi
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const CustomAppBar(title: 'Announcements'),
+      appBar: const CustomAppBar(title: 'Announcements', showBackButton: false),
       body: ListenableBuilder(
         listenable: MockDatabase.instance,
         builder: (context, _) {

@@ -10,6 +10,7 @@ List<UserModel> getDummyUsers() {
       joinedPrograms: ['prog_1', 'prog_3'],
       completedPrograms: ['prog_6'],
       achievements: ['UI/UX Mastery', 'Orientation Completed', 'Early Bird Learner'],
+      skills: ['Flutter', 'Dart', 'React', 'Node.js', 'Figma', 'Git'],
     ),
     UserModel(
       id: 'user_2',
@@ -19,6 +20,7 @@ List<UserModel> getDummyUsers() {
       joinedPrograms: ['prog_2'],
       completedPrograms: [],
       achievements: ['Quick Starter'],
+      skills: ['Python', 'TensorFlow', 'Data Processing', 'NLP'],
     ),
   ];
 }

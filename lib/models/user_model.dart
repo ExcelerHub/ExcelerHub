@@ -6,6 +6,7 @@ class UserModel {
   final List<String> joinedPrograms;
   final List<String> completedPrograms;
   final List<String> achievements;
+  final List<String> skills;
 
   UserModel({
     required this.id,
@@ -15,6 +16,7 @@ class UserModel {
     required this.joinedPrograms,
     required this.completedPrograms,
     required this.achievements,
+    required this.skills,
   });
 
   UserModel copyWith({
@@ -25,6 +27,7 @@ class UserModel {
     List<String>? joinedPrograms,
     List<String>? completedPrograms,
     List<String>? achievements,
+    List<String>? skills,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -34,6 +37,7 @@ class UserModel {
       joinedPrograms: joinedPrograms ?? List.from(this.joinedPrograms),
       completedPrograms: completedPrograms ?? List.from(this.completedPrograms),
       achievements: achievements ?? List.from(this.achievements),
+      skills: skills ?? List.from(this.skills),
     );
   }
 
@@ -47,6 +51,7 @@ class UserModel {
       'joinedPrograms': joinedPrograms,
       'completedPrograms': completedPrograms,
       'achievements': achievements,
+      'skills': skills,
     };
   }
 
@@ -60,6 +65,7 @@ class UserModel {
       joinedPrograms: List<String>.from(map['joinedPrograms'] ?? []),
       completedPrograms: List<String>.from(map['completedPrograms'] ?? []),
       achievements: List<String>.from(map['achievements'] ?? []),
+      skills: List<String>.from(map['skills'] ?? []),
     );
   }
 }

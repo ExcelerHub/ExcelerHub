@@ -68,6 +68,7 @@ class MockDatabase extends ChangeNotifier {
       joinedPrograms: [],
       completedPrograms: [],
       achievements: ['New Account Created'],
+      skills: [],
     );
 
     _users.add(newUser);

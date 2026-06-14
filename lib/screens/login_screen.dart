@@ -4,7 +4,7 @@ import '../utils/app_colors.dart';
 import '../utils/constants.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
-import 'dashboard_screen.dart';
+import 'main_shell.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (success) {
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const DashboardScreen()),
+            MaterialPageRoute(builder: (context) => const MainShell()),
             (route) => false,
           );
         } else {

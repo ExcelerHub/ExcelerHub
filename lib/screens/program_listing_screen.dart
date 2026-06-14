@@ -8,10 +8,12 @@ import 'program_details_screen.dart';
 
 class ProgramListingScreen extends StatefulWidget {
   final bool autoFocusSearch;
+  final VoidCallback? onSearchFocused;
 
   const ProgramListingScreen({
     super.key,
     this.autoFocusSearch = false,
+    this.onSearchFocused,
   });
 
   @override
@@ -30,6 +32,7 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
     if (widget.autoFocusSearch) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _focusNode.requestFocus();
+        widget.onSearchFocused?.call();
       });
     }
   }
@@ -67,7 +70,7 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const CustomAppBar(title: 'Programs & Internships'),
+      appBar: const CustomAppBar(title: 'Programs', showBackButton: false),
       body: ListenableBuilder(
         listenable: MockDatabase.instance,
         builder: (context, _) {

@@ -6,6 +6,9 @@ import '../utils/constants.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
+import '../widgets/skill_chip.dart';
+import 'login_screen.dart';
+import 'program_details_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -63,8 +66,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  
-                  // Name TextField
                   CustomTextField(
                     labelText: 'Full Name',
                     hintText: 'Your name',
@@ -72,14 +73,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     controller: _nameController,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Name is required';
+                        return 'Please enter your name';
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 20),
-                  
-                  // Email TextField
                   CustomTextField(
                     labelText: 'Email Address',
                     hintText: 'Your email address',
@@ -88,7 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Email is required';
+                        return 'Please enter your email';
                       }
                       final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
                       if (!emailRegExp.hasMatch(value.trim())) {
@@ -98,8 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-                  
-                  // Save Button
                   CustomButton(
                     text: 'Save Changes',
                     onPressed: () {
@@ -130,6 +127,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              AuthService.instance.logout();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (route) => false,
+              );
+            },
+            child: const Text('Log Out', style: TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -141,18 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: CustomAppBar(
-        title: 'My Profile',
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: AppColors.error),
-            onPressed: () {
-              AuthService.instance.logout();
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-          ),
-        ],
-      ),
+      appBar: const CustomAppBar(title: 'Profile', showBackButton: false),
       body: ListenableBuilder(
         listenable: AuthService.instance,
         builder: (context, _) {
@@ -164,25 +177,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return ListenableBuilder(
             listenable: MockDatabase.instance,
             builder: (context, _) {
-              // Get details of joined programs
               final joinedProgs = MockDatabase.instance.programs
                   .where((p) => user.joinedPrograms.contains(p.id))
                   .toList();
 
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header Avatar Card
                     Center(
                       child: Column(
                         children: [
                           Stack(
                             children: [
                               CircleAvatar(
-                                radius: 50,
+                                radius: 48,
                                 backgroundColor: AppColors.primary.withOpacity(0.1),
                                 child: Text(
                                   user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
@@ -196,17 +207,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Positioned(
                                 bottom: 0,
                                 right: 0,
-                                child: Container(
-                                  height: 32,
-                                  width: 32,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: IconButton(
-                                    padding: EdgeInsets.zero,
-                                    icon: const Icon(Icons.edit, color: Colors.white, size: 16),
-                                    onPressed: () => _showEditProfileDialog(context, user.name, user.email),
+                                child: GestureDetector(
+                                  onTap: () => _showEditProfileDialog(context, user.name, user.email),
+                                  child: Container(
+                                    height: 36,
+                                    width: 36,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.edit, color: Colors.white, size: 18),
                                   ),
                                 ),
                               ),
@@ -216,7 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Text(
                             user.name,
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textPrimary,
                             ),
@@ -234,7 +244,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Stats row
                     Row(
                       children: [
                         _buildStatCard('Enrolled', '${user.joinedPrograms.length}', Colors.blue),
@@ -244,11 +253,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildStatCard('Badges', '${user.achievements.length}', Colors.amber),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
 
-                    // Achievements Section
                     const Text(
-                      'Achievements & Badges',
+                      'Skills',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -256,42 +264,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    user.achievements.isEmpty
-                        ? const Text('Enroll in programs and complete tasks to win badges!')
+                    user.skills.isEmpty
+                        ? Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+                              border: Border.all(color: Colors.grey.shade100),
+                            ),
+                            child: const Text(
+                              'Join programs to build your skill profile.',
+                              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                            ),
+                          )
                         : Wrap(
                             spacing: 8,
                             runSpacing: 8,
-                            children: user.achievements.map((badge) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.amber.withOpacity(0.25), width: 1),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.emoji_events, color: Colors.amber, size: 16),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      badge,
-                                      style: const TextStyle(
-                                        color: Colors.amber,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
+                            children: user.skills.map((skill) => SkillChip(label: skill)).toList(),
                           ),
                     const SizedBox(height: 28),
 
-                    // Joined Programs Section
                     const Text(
-                      'Enrolled Programs',
+                      'Registered Programs',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -313,8 +308,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Icon(Icons.school_outlined, size: 40, color: AppColors.textLight),
                                 SizedBox(height: 8),
                                 Text(
-                                  "You haven't joined any programs yet.",
+                                  "You haven't registered for any programs yet.",
                                   style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                                  textAlign: TextAlign.center,
                                 ),
                               ],
                             ),
@@ -335,14 +331,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   side: BorderSide(color: Colors.grey.shade100, width: 1.5),
                                 ),
                                 child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => ProgramDetailsScreen(programId: prog.id),
+                                      ),
+                                    );
+                                  },
                                   leading: Container(
-                                    padding: const EdgeInsets.all(8),
+                                    padding: const EdgeInsets.all(10),
                                     decoration: BoxDecoration(
                                       color: AppColors.primary.withOpacity(0.08),
-                                      shape: BoxShape.circle,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: const Icon(Icons.menu_book, color: AppColors.primary, size: 20),
+                                    child: const Icon(Icons.menu_book, color: AppColors.primary, size: 22),
                                   ),
                                   title: Text(
                                     prog.title,
@@ -357,7 +360,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                                   ),
                                   trailing: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
                                       color: isCompleted
                                           ? AppColors.success.withOpacity(0.1)
@@ -365,7 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      isCompleted ? 'COMPLETED' : 'IN PROGRESS',
+                                      isCompleted ? 'DONE' : 'ACTIVE',
                                       style: TextStyle(
                                         color: isCompleted ? AppColors.success : AppColors.primary,
                                         fontSize: 10,
@@ -377,6 +380,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               );
                             },
                           ),
+                    const SizedBox(height: 28),
+
+                    const Text(
+                      'Settings',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildSettingsTile(
+                      icon: Icons.edit_outlined,
+                      title: 'Edit Profile',
+                      onTap: () => _showEditProfileDialog(context, user.name, user.email),
+                    ),
+                    _buildSettingsTile(
+                      icon: Icons.notifications_outlined,
+                      title: 'Notification Preferences',
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Notification settings coming soon.'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                    ),
+                    _buildSettingsTile(
+                      icon: Icons.logout,
+                      title: 'Log Out',
+                      isDestructive: true,
+                      onTap: () => _confirmLogout(context),
+                    ),
                   ],
                 ),
               );
@@ -395,13 +432,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
           border: Border.all(color: Colors.grey.shade100, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.01),
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
         ),
         child: Column(
           children: [
@@ -424,6 +454,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsTile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    final color = isDestructive ? AppColors.error : AppColors.textPrimary;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+        side: BorderSide(color: Colors.grey.shade100),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        minVerticalPadding: 12,
+        leading: Icon(icon, color: color, size: 22),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+            color: color,
+          ),
+        ),
+        trailing: Icon(Icons.chevron_right, color: AppColors.textLight, size: 20),
+        onTap: onTap,
       ),
     );
   }

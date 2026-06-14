@@ -6,32 +6,24 @@ import '../utils/constants.dart';
 import '../widgets/progress_card.dart';
 import '../widgets/task_tile.dart';
 import '../widgets/announcement_card.dart';
-import 'program_listing_screen.dart';
-import 'task_tracker_screen.dart';
-import 'profile_screen.dart';
-import 'announcements_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final void Function(int index, {bool autoFocusProgramsSearch})? onTabSelected;
+
+  const DashboardScreen({
+    super.key,
+    this.onTabSelected,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final _searchController = TextEditingController();
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  // Calculate user progress
   Map<String, dynamic> _calculateProgress(String userId) {
     final userTasks = MockDatabase.instance.getTasksForUser(userId);
     if (userTasks.isEmpty) return {'percentage': 0.0, 'completed': 0, 'total': 0};
-    
+
     final completed = userTasks.where((t) => t.isCompleted).length;
     final total = userTasks.length;
     return {
@@ -39,6 +31,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'completed': completed,
       'total': total,
     };
+  }
+
+  void _goToTab(int index, {bool autoFocusProgramsSearch = false}) {
+    widget.onTabSelected?.call(index, autoFocusProgramsSearch: autoFocusProgramsSearch);
   }
 
   @override
@@ -60,55 +56,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
             final allTasks = MockDatabase.instance.getTasksForUser(user.id);
             final pendingTasks = allTasks.where((t) => !t.isCompleted).take(3).toList();
             final recentAnnouncements = MockDatabase.instance.announcements.take(2).toList();
+            final enrolledCount = user.joinedPrograms.length;
+            final announcementCount = MockDatabase.instance.announcements.length;
 
             return Scaffold(
               backgroundColor: AppColors.background,
               body: SafeArea(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 1. Welcome Banner
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Welcome,',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textSecondary,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Welcome back,',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                user.name,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
+                                Text(
+                                  user.name.split(' ').first,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                           GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                              );
-                            },
+                            onTap: () => _goToTab(4),
                             child: CircleAvatar(
-                              radius: 24,
+                              radius: 26,
                               backgroundColor: AppColors.primary.withOpacity(0.1),
                               child: Text(
                                 user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
                                 style: const TextStyle(
                                   color: AppColors.primary,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18,
+                                  fontSize: 20,
                                 ),
                               ),
                             ),
@@ -117,46 +112,60 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // 2. Search Bar Placeholder/Search Button
                       GestureDetector(
-                        onTap: () {
-                          // Search navigates to programs or announcements
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const ProgramListingScreen(autoFocusSearch: true)),
-                          );
-                        },
+                        onTap: () => _goToTab(1, autoFocusProgramsSearch: true),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                             border: Border.all(color: Colors.grey.shade200),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.01),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.search, color: AppColors.textLight),
+                              Icon(Icons.search, color: AppColors.textLight, size: 22),
                               SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  'Search programs, tasks, announcements...',
-                                  style: TextStyle(color: AppColors.textLight, fontSize: 14),
+                                  'Search programs...',
+                                  style: TextStyle(color: AppColors.textLight, fontSize: 15),
                                 ),
                               ),
-                              Icon(Icons.tune, color: AppColors.primary, size: 20),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
 
-                      // 3. Learning Progress Card
+                      Row(
+                        children: [
+                          _buildOverviewCard(
+                            icon: Icons.school_outlined,
+                            label: 'Programs',
+                            value: '$enrolledCount',
+                            color: const Color(0xff3b82f6),
+                            onTap: () => _goToTab(1),
+                          ),
+                          const SizedBox(width: 10),
+                          _buildOverviewCard(
+                            icon: Icons.task_alt_outlined,
+                            label: 'Pending',
+                            value: '${allTasks.where((t) => !t.isCompleted).length}',
+                            color: const Color(0xff10b981),
+                            onTap: () => _goToTab(2),
+                          ),
+                          const SizedBox(width: 10),
+                          _buildOverviewCard(
+                            icon: Icons.campaign_outlined,
+                            label: 'Updates',
+                            value: '$announcementCount',
+                            color: const Color(0xff8b5cf6),
+                            onTap: () => _goToTab(3),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
                       ProgressCard(
                         percentage: progressData['percentage'],
                         completedTasks: progressData['completed'],
@@ -164,7 +173,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Quick Access Grid Section
                       const Text(
                         'Quick Access',
                         style: TextStyle(
@@ -177,52 +185,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       GridView.count(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 4,
+                        crossAxisCount: 2,
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 12,
-                        childAspectRatio: 0.85,
+                        childAspectRatio: 1.6,
                         children: [
-                          _buildQuickAccessCard(
-                            context,
+                          _buildShortcutCard(
                             icon: Icons.school_outlined,
                             label: 'Programs',
+                            subtitle: 'Browse internships',
                             color: const Color(0xff3b82f6),
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const ProgramListingScreen()),
-                            ),
+                            onTap: () => _goToTab(1),
                           ),
-                          _buildQuickAccessCard(
-                            context,
+                          _buildShortcutCard(
                             icon: Icons.task_alt_outlined,
                             label: 'Tasks',
+                            subtitle: 'Track progress',
                             color: const Color(0xff10b981),
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const TaskTrackerScreen()),
-                            ),
+                            onTap: () => _goToTab(2),
                           ),
-                          _buildQuickAccessCard(
-                            context,
+                          _buildShortcutCard(
+                            icon: Icons.campaign_outlined,
+                            label: 'Announcements',
+                            subtitle: 'Latest updates',
+                            color: const Color(0xff8b5cf6),
+                            onTap: () => _goToTab(3),
+                          ),
+                          _buildShortcutCard(
                             icon: Icons.person_outline,
                             label: 'Profile',
+                            subtitle: 'Your account',
                             color: const Color(0xfff59e0b),
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                            ),
-                          ),
-                          _buildQuickAccessCard(
-                            context,
-                            icon: Icons.campaign_outlined,
-                            label: 'Announce',
-                            color: const Color(0xff8b5cf6),
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const AnnouncementsScreen()),
-                            ),
+                            onTap: () => _goToTab(4),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
 
-                      // 4. Upcoming Tasks Section
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -235,33 +234,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const TaskTrackerScreen()),
-                            ),
+                            onPressed: () => _goToTab(2),
                             child: const Text('View All'),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       pendingTasks.isEmpty
-                          ? Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-                                border: Border.all(color: Colors.grey.shade100),
-                              ),
-                              child: const Column(
-                                children: [
-                                  Icon(Icons.check_circle_outline, size: 36, color: AppColors.success),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'All caught up! No pending tasks.',
-                                    style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                                  ),
-                                ],
-                              ),
+                          ? _buildEmptyState(
+                              icon: Icons.check_circle_outline,
+                              message: 'All caught up! No pending tasks.',
                             )
                           : ListView.builder(
                               shrinkWrap: true,
@@ -278,49 +260,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                       const SizedBox(height: 24),
 
-                      // 5. Upcoming Events Section
-                      const Text(
-                        'Upcoming Internship Events',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        height: 110,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          children: [
-                            _buildEventCard(
-                              title: 'Orientation Cohort Kickoff',
-                              date: 'June 18',
-                              time: '10:00 AM',
-                              type: 'LIVE SESSION',
-                              icon: Icons.diversity_3_outlined,
-                            ),
-                            _buildEventCard(
-                              title: 'Technical Overview (Flutter)',
-                              date: 'June 20',
-                              time: '3:00 PM',
-                              type: 'WORKSHOP',
-                              icon: Icons.code,
-                            ),
-                            _buildEventCard(
-                              title: 'AI/ML Projects Deep-dive',
-                              date: 'June 24',
-                              time: '11:00 AM',
-                              type: 'SEMINAR',
-                              icon: Icons.psychology_outlined,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // 6. Recent Announcements Section
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -333,22 +272,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(builder: (context) => const AnnouncementsScreen()),
-                            ),
+                            onPressed: () => _goToTab(3),
                             child: const Text('View All'),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: recentAnnouncements.length,
-                        itemBuilder: (context, index) {
-                          return AnnouncementCard(announcement: recentAnnouncements[index]);
-                        },
-                      ),
+                      recentAnnouncements.isEmpty
+                          ? _buildEmptyState(
+                              icon: Icons.campaign_outlined,
+                              message: 'No announcements yet.',
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: recentAnnouncements.length,
+                              itemBuilder: (context, index) {
+                                return AnnouncementCard(announcement: recentAnnouncements[index]);
+                              },
+                            ),
                     ],
                   ),
                 ),
@@ -360,46 +302,109 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildQuickAccessCard(
-    BuildContext context, {
+  Widget _buildOverviewCard({
     required IconData icon,
     required String label,
+    required String value,
     required Color color,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
+    return Expanded(
+      child: Material(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        side: BorderSide(color: Colors.grey.shade100, width: 1.5),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+              border: Border.all(color: Colors.grey.shade100),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(icon, color: color, size: 22),
+                const SizedBox(height: 8),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _buildShortcutCard({
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
+            border: Border.all(color: Colors.grey.shade100),
+          ),
+          child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: Icon(icon, color: color, size: 24),
               ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-                textAlign: TextAlign.center,
               ),
+              Icon(Icons.chevron_right, color: color.withOpacity(0.6)),
             ],
           ),
         ),
@@ -407,74 +412,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildEventCard({
-    required String title,
-    required String date,
-    required String time,
-    required String type,
-    required IconData icon,
-  }) {
+  Widget _buildEmptyState({required IconData icon, required String message}) {
     return Container(
-      width: 240,
-      margin: const EdgeInsets.only(right: 14, bottom: 4),
-      padding: const EdgeInsets.all(14),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-        border: Border.all(color: Colors.grey.shade100, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.01),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        border: Border.all(color: Colors.grey.shade100),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  type,
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              Icon(icon, size: 14, color: AppColors.textSecondary),
-            ],
-          ),
+          Icon(icon, size: 36, color: AppColors.textLight),
           const SizedBox(height: 8),
           Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              const Icon(Icons.access_time, size: 12, color: AppColors.textSecondary),
-              const SizedBox(width: 4),
-              Text(
-                '$date at $time',
-                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
-              ),
-            ],
+            message,
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

@@ -21,11 +21,9 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _q1Controller = TextEditingController();
-  final _q2Controller = TextEditingController();
-  final _q3Controller = TextEditingController();
-  
-  double _rating = 5.0; // default to 5 star
+  final _feedbackController = TextEditingController();
+
+  double _rating = 4.0;
   bool _isLoading = false;
 
   void _submitFeedback() {
@@ -40,18 +38,12 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         final user = AuthService.instance.currentUser;
         if (user == null) return;
 
-        // Concatenate comments from all three questions
-        final commentsText = 
-            'Q1 (Satisfaction): ${_q1Controller.text.trim()}\n'
-            'Q2 (Learned): ${_q2Controller.text.trim()}\n'
-            'Q3 (Suggestions): ${_q3Controller.text.trim()}';
-
         final feedback = FeedbackModel(
           userName: user.name,
           programName: widget.programName,
           rating: _rating,
-          comments: commentsText,
-          timestamp: 'June 12, 2026', // dynamic date could be fetched but static mock date matches formatting
+          comments: _feedbackController.text.trim(),
+          timestamp: 'June 14, 2026',
         );
 
         MockDatabase.instance.submitFeedback(feedback);
@@ -62,7 +54,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Feedback submitted successfully! Thank you.'),
+            content: Text('Thank you! Your feedback has been submitted.'),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
           ),
@@ -75,9 +67,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   @override
   void dispose() {
-    _q1Controller.dispose();
-    _q2Controller.dispose();
-    _q3Controller.dispose();
+    _feedbackController.dispose();
     super.dispose();
   }
 
@@ -85,7 +75,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: CustomAppBar(title: 'Submit Feedback'),
+      appBar: const CustomAppBar(title: 'Feedback'),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -95,7 +85,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Program Name banner
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -126,11 +115,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                
-                // Star Rating Selection
+                const SizedBox(height: 32),
+
                 const Text(
-                  'Program Rating',
+                  'How would you rate this program?',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -138,16 +126,26 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
+                Text(
+                  _ratingLabel(_rating),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(5, (index) {
                     final starVal = index + 1.0;
                     return IconButton(
+                      iconSize: 48,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       icon: Icon(
-                        _rating >= starVal ? Icons.star : Icons.star_border,
+                        _rating >= starVal ? Icons.star_rounded : Icons.star_outline_rounded,
                         color: Colors.amber,
-                        size: 40,
                       ),
                       onPressed: () {
                         setState(() {
@@ -157,72 +155,50 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     );
                   }),
                 ),
-                const SizedBox(height: 24),
-                
-                // Question 1: How satisfied are you?
+                const SizedBox(height: 32),
+
                 const Text(
-                  '1. How satisfied are you with this program?',
+                  'Your Feedback',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
-                TextFormField(
-                  controller: _q1Controller,
-                  maxLines: 2,
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Please answer this question' : null,
-                  decoration: const InputDecoration(
-                    hintText: 'e.g., Highly satisfied, the mentorship was fantastic...',
-                  ),
-                ),
-                const SizedBox(height: 20),
-                
-                // Question 2: What did you learn?
                 const Text(
-                  '2. What did you learn?',
+                  'Share your experience, what you learned, or suggestions for improvement.',
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                    height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TextFormField(
-                  controller: _q2Controller,
-                  maxLines: 3,
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Please answer this question' : null,
+                  controller: _feedbackController,
+                  maxLines: 6,
+                  minLines: 4,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Please share your feedback before submitting';
+                    }
+                    if (value.trim().length < 10) {
+                      return 'Please write at least 10 characters';
+                    }
+                    return null;
+                  },
                   decoration: const InputDecoration(
-                    hintText: 'e.g., Learned clean architecture, Flutter widgets, and REST integrations...',
-                  ),
-                ),
-                const SizedBox(height: 20),
-                
-                // Question 3: Suggestions?
-                const Text(
-                  '3. Suggestions for improvement?',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _q3Controller,
-                  maxLines: 2,
-                  validator: (value) => value == null || value.trim().isEmpty ? 'Please answer this question' : null,
-                  decoration: const InputDecoration(
-                    hintText: 'e.g., More live coding sessions would be great...',
+                    hintText: 'Tell us about your experience with this program...',
+                    alignLabelWithHint: true,
                   ),
                 ),
                 const SizedBox(height: 32),
-                
-                // Submit Button
+
                 CustomButton(
                   text: 'Submit Feedback',
                   isLoading: _isLoading,
+                  icon: Icons.send_rounded,
                   onPressed: _submitFeedback,
                 ),
               ],
@@ -231,5 +207,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         ),
       ),
     );
+  }
+
+  String _ratingLabel(double rating) {
+    if (rating >= 5) return 'Excellent';
+    if (rating >= 4) return 'Good';
+    if (rating >= 3) return 'Average';
+    if (rating >= 2) return 'Below Average';
+    return 'Poor';
   }
 }

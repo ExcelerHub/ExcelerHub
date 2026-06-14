@@ -125,26 +125,25 @@ class ProgramCard extends StatelessWidget {
                     children: program.skills.take(3).map((skill) => SkillChip(label: skill)).toList(),
                   ),
                   const SizedBox(height: 16),
-                  
-                  // View Details Button
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: OutlinedButton.icon(
+                      onPressed: onTap,
+                      icon: const Icon(Icons.arrow_forward, size: 18),
+                      label: const Text(
                         'View Details',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.arrow_forward,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),

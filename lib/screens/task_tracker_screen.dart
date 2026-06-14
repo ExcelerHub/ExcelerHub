@@ -40,7 +40,7 @@ class _TaskTrackerScreenState extends State<TaskTrackerScreen> with SingleTicker
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const CustomAppBar(title: 'Task Tracker'),
+      appBar: const CustomAppBar(title: 'Tasks', showBackButton: false),
       body: ListenableBuilder(
         listenable: MockDatabase.instance,
         builder: (context, _) {

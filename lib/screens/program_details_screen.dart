@@ -181,6 +181,52 @@ class ProgramDetailsScreen extends StatelessWidget {
                               runSpacing: 8,
                               children: program.skills.map((skill) => SkillChip(label: skill)).toList(),
                             ),
+                            const SizedBox(height: 20),
+
+                            // Learning Outcomes Section
+                            const Text(
+                              'Learning Outcomes',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ...program.learningOutcomes.map(
+                              (outcome) => Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 4),
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.success.withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.check,
+                                        size: 12,
+                                        color: AppColors.success,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        outcome,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.textSecondary,
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -190,61 +236,61 @@ class ProgramDetailsScreen extends StatelessWidget {
               ),
               
               // Bottom Action Buttons
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, -4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    // Give Feedback Button
-                    Expanded(
-                      flex: 2,
-                      child: CustomButton(
-                        text: 'Feedback',
-                        isSecondary: true,
-                        icon: Icons.rate_review_outlined,
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => FeedbackScreen(programName: program.title),
-                            ),
-                          );
-                        },
+              SafeArea(
+                top: false,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, -4),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    
-                    // Join Program Button
-                    Expanded(
-                      flex: 3,
-                      child: CustomButton(
-                        text: isJoined ? 'Enrolled' : 'Join Program',
-                        icon: isJoined ? Icons.check : Icons.add_circle_outline,
-                        onPressed: isJoined || user == null
-                            ? null // already joined or not logged in
-                            : () {
-                                final success = MockDatabase.instance.joinProgram(user.id, programId);
-                                if (success) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Successfully Joined ${program.title}'),
-                                      backgroundColor: AppColors.success,
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                }
-                              },
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: CustomButton(
+                          text: 'Feedback',
+                          isSecondary: true,
+                          icon: Icons.rate_review_outlined,
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => FeedbackScreen(programName: program.title),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 3,
+                        child: CustomButton(
+                          text: isJoined ? 'Registered' : 'Register',
+                          icon: isJoined ? Icons.check_circle : Icons.app_registration_outlined,
+                          onPressed: isJoined || user == null
+                              ? null
+                              : () {
+                                  final success = MockDatabase.instance.joinProgram(user.id, programId);
+                                  if (success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Successfully registered for ${program.title}'),
+                                        backgroundColor: AppColors.success,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  }
+                                },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -24,7 +24,8 @@ class AuthService extends ChangeNotifier {
             dbUser.email != _currentUser!.email ||
             dbUser.joinedPrograms.length != _currentUser!.joinedPrograms.length ||
             dbUser.completedPrograms.length != _currentUser!.completedPrograms.length ||
-            dbUser.achievements.length != _currentUser!.achievements.length) {
+            dbUser.achievements.length != _currentUser!.achievements.length ||
+            dbUser.skills.length != _currentUser!.skills.length) {
           _currentUser = dbUser;
           notifyListeners();
         }

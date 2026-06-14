@@ -6,6 +6,7 @@ class ProgramModel {
   final String startDate;
   final String eligibility;
   final List<String> skills;
+  final List<String> learningOutcomes;
   final String mentor;
   final List<String> joinedUsers;
   final String? imageUrl; // optional placeholder helper
@@ -18,6 +19,7 @@ class ProgramModel {
     required this.startDate,
     required this.eligibility,
     required this.skills,
+    required this.learningOutcomes,
     required this.mentor,
     required this.joinedUsers,
     this.imageUrl,
@@ -31,6 +33,7 @@ class ProgramModel {
     String? startDate,
     String? eligibility,
     List<String>? skills,
+    List<String>? learningOutcomes,
     String? mentor,
     List<String>? joinedUsers,
     String? imageUrl,
@@ -43,6 +46,7 @@ class ProgramModel {
       startDate: startDate ?? this.startDate,
       eligibility: eligibility ?? this.eligibility,
       skills: skills ?? List.from(this.skills),
+      learningOutcomes: learningOutcomes ?? List.from(this.learningOutcomes),
       mentor: mentor ?? this.mentor,
       joinedUsers: joinedUsers ?? List.from(this.joinedUsers),
       imageUrl: imageUrl ?? this.imageUrl,
@@ -58,6 +62,7 @@ class ProgramModel {
       'startDate': startDate,
       'eligibility': eligibility,
       'skills': skills,
+      'learningOutcomes': learningOutcomes,
       'mentor': mentor,
       'joinedUsers': joinedUsers,
       'imageUrl': imageUrl,
@@ -73,6 +78,7 @@ class ProgramModel {
       startDate: map['startDate'] ?? '',
       eligibility: map['eligibility'] ?? '',
       skills: List<String>.from(map['skills'] ?? []),
+      learningOutcomes: List<String>.from(map['learningOutcomes'] ?? []),
       mentor: map['mentor'] ?? '',
       joinedUsers: List<String>.from(map['joinedUsers'] ?? []),
       imageUrl: map['imageUrl'],
