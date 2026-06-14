@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../utils/app_colors.dart';
 import '../utils/constants.dart';
+import '../widgets/app_logo.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
 import 'main_shell.dart';
@@ -71,42 +72,9 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.12),
-                Center(
-                  child: Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(
-                      Icons.school_outlined,
-                      color: AppColors.primary,
-                      size: 32,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  AppConstants.appName,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Welcome back',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 40),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.08),
+                const Center(child: AppLogo(size: 64, showTagline: true)),
+                const SizedBox(height: 36),
                 CustomTextField(
                   labelText: 'Email',
                   hintText: 'name@example.com',
@@ -116,7 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.trim().isEmpty) {
                       return 'Email is required';
                     }
-                    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                    final emailRegExp =
+                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
                     if (!emailRegExp.hasMatch(value.trim())) {
                       return 'Enter a valid email address';
                     }
@@ -139,13 +108,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
                 CustomButton(
                   text: 'Login',
                   isLoading: _isLoading,
                   onPressed: _handleLogin,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -164,6 +133,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text('Register'),
                     ),
                   ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppConstants.appDescription,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textLight,
+                  ),
                 ),
               ],
             ),

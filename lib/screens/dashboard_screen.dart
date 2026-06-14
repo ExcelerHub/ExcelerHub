@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/mock_database.dart';
 import '../utils/app_colors.dart';
+import '../utils/constants.dart';
 import '../widgets/announcement_card.dart';
+import '../widgets/app_card.dart';
+import '../widgets/program_card.dart';
+import '../widgets/section_header.dart';
+import '../widgets/task_tile.dart';
 import 'program_details_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final void Function(int index, {bool autoFocusProgramsSearch})? onTabSelected;
 
-  const DashboardScreen({
-    super.key,
-    this.onTabSelected,
-  });
+  const DashboardScreen({super.key, this.onTabSelected});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -19,7 +21,10 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   void _goToTab(int index, {bool autoFocusProgramsSearch = false}) {
-    widget.onTabSelected?.call(index, autoFocusProgramsSearch: autoFocusProgramsSearch);
+    widget.onTabSelected?.call(
+      index,
+      autoFocusProgramsSearch: autoFocusProgramsSearch,
+    );
   }
 
   @override
@@ -29,202 +34,248 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, _) {
         final user = AuthService.instance.currentUser;
         if (user == null) {
-          return const Scaffold(
-            body: Center(child: Text('Not authenticated')),
-          );
+          return const Scaffold(body: Center(child: Text('Not authenticated')));
         }
 
         return ListenableBuilder(
           listenable: MockDatabase.instance,
           builder: (context, _) {
-            final featuredProgram = MockDatabase.instance.programs.isNotEmpty
-                ? MockDatabase.instance.programs.first
-                : null;
-            final recentAnnouncements =
-                MockDatabase.instance.announcements.take(3).toList();
+            final db = MockDatabase.instance;
+            final programs = db.programs;
+            final enrolledPrograms = programs
+                .where((p) => user.joinedPrograms.contains(p.id))
+                .toList();
+            final continueProgram = enrolledPrograms.isNotEmpty
+                ? enrolledPrograms.first
+                : (programs.isNotEmpty ? programs.first : null);
+            final previewPrograms = programs.take(2).toList();
+            final previewAnnouncements = db.announcements.take(2).toList();
+            final pendingTasks = db
+                .getTasksForUser(user.id)
+                .where((t) => !t.isCompleted)
+                .take(2)
+                .toList();
 
             return Scaffold(
               backgroundColor: AppColors.background,
               body: SafeArea(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppConstants.paddingLarge,
+                    12,
+                    AppConstants.paddingLarge,
+                    24,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Welcome, ${user.name.split(' ').first}',
+                        'Welcome back',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        user.name.split(' ').first,
                         style: const TextStyle(
                           fontSize: 24,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'Find your next learning program',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: AppColors.textSecondary,
+                      Text(
+                        AppConstants.appTagline,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textLight,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
 
                       GestureDetector(
-                        onTap: () => _goToTab(1, autoFocusProgramsSearch: true),
+                        onTap: () =>
+                            _goToTab(1, autoFocusProgramsSearch: true),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
+                            horizontal: 14,
+                            vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xfff8fafc),
-                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.card,
+                            borderRadius: BorderRadius.circular(
+                              AppConstants.borderRadiusMedium,
+                            ),
                             border: Border.all(color: AppColors.divider),
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.search, color: AppColors.textLight, size: 22),
-                              SizedBox(width: 12),
+                              Icon(
+                                Icons.search,
+                                color: AppColors.textLight,
+                                size: 20,
+                              ),
+                              SizedBox(width: 10),
                               Text(
                                 'Search programs',
                                 style: TextStyle(
                                   color: AppColors.textLight,
-                                  fontSize: 15,
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
 
-                      if (featuredProgram != null) ...[
-                        const Text(
-                          'Featured Program',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                      if (continueProgram != null) ...[
+                        const SectionHeader(title: 'Continue Learning'),
+                        const SizedBox(height: 10),
+                        AppCard(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ProgramDetailsScreen(
+                                  programId: continueProgram.id,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.play_circle_outline,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      continueProgram.title,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      continueProgram.duration,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const Icon(
+                                Icons.chevron_right,
+                                color: AppColors.textLight,
+                                size: 20,
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Material(
-                          color: const Color(0xfff8fafc),
-                          borderRadius: BorderRadius.circular(12),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
+                        const SizedBox(height: 24),
+                      ],
+
+                      SectionHeader(
+                        title: 'Programs',
+                        actionLabel: 'See all',
+                        onAction: () => _goToTab(1),
+                      ),
+                      const SizedBox(height: 10),
+                      ...previewPrograms.map(
+                        (program) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: ProgramCard(
+                            program: program,
+                            compact: true,
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => ProgramDetailsScreen(
-                                    programId: featuredProgram.id,
+                                    programId: program.id,
                                   ),
                                 ),
                               );
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    featuredProgram.title,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    featuredProgram.description,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors.textSecondary,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    '${featuredProgram.duration} · Starts ${featuredProgram.startDate}',
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      color: AppColors.textLight,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
                         ),
-                        const SizedBox(height: 32),
-                      ],
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Recent Announcements',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => _goToTab(2),
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: const Text('See all'),
-                          ),
-                        ],
                       ),
-                      const SizedBox(height: 8),
-                      if (recentAnnouncements.isEmpty)
+                      const SizedBox(height: 16),
+
+                      SectionHeader(
+                        title: 'Announcements',
+                        actionLabel: 'See all',
+                        onAction: () => _goToTab(3),
+                      ),
+                      const SizedBox(height: 10),
+                      if (previewAnnouncements.isEmpty)
                         const Text(
                           'No announcements yet.',
                           style: TextStyle(
                             color: AppColors.textSecondary,
-                            fontSize: 14,
+                            fontSize: 13,
                           ),
                         )
                       else
-                        ...recentAnnouncements.map(
-                          (announcement) => AnnouncementCard(
-                            announcement: announcement,
+                        AppCard(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            children: previewAnnouncements
+                                .map(
+                                  (a) => AnnouncementCard(
+                                    announcement: a,
+                                    compact: true,
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ),
                       const SizedBox(height: 16),
 
-                      const Text(
-                        'Quick navigation',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                      SectionHeader(
+                        title: 'Upcoming Tasks',
+                        actionLabel: 'See all',
+                        onAction: () => _goToTab(2),
+                      ),
+                      const SizedBox(height: 10),
+                      if (pendingTasks.isEmpty)
+                        const Text(
+                          'All caught up! No pending tasks.',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
+                        )
+                      else
+                        ...pendingTasks.map(
+                          (task) => TaskTile(
+                            task: task,
+                            compact: true,
+                            onToggle: () =>
+                                db.toggleTaskCompletion(task.id),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      _QuickNavButton(
-                        icon: Icons.school_outlined,
-                        label: 'Browse Programs',
-                        onTap: () => _goToTab(1),
-                      ),
-                      _QuickNavButton(
-                        icon: Icons.campaign_outlined,
-                        label: 'Announcements',
-                        onTap: () => _goToTab(2),
-                      ),
-                      _QuickNavButton(
-                        icon: Icons.person_outline,
-                        label: 'My Profile',
-                        onTap: () => _goToTab(3),
-                      ),
                     ],
                   ),
                 ),
@@ -233,53 +284,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           },
         );
       },
-    );
-  }
-}
-
-class _QuickNavButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _QuickNavButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Row(
-            children: [
-              Icon(icon, color: AppColors.primary, size: 22),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.textLight,
-                size: 22,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

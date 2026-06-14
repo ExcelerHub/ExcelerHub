@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/mock_database.dart';
-import '../models/program_model.dart';
 import '../utils/app_colors.dart';
+import '../utils/constants.dart';
+import '../utils/program_utils.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/program_card.dart';
 import 'program_details_screen.dart';
@@ -26,6 +27,15 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
   String _searchQuery = '';
   String _selectedCategory = 'All';
 
+  static const _categories = [
+    'All',
+    'Mobile',
+    'Data & AI',
+    'Web Dev',
+    'Security',
+    'General',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -44,25 +54,6 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
     super.dispose();
   }
 
-  bool _matchesCategory(ProgramModel program, String category) {
-    if (category == 'All') return true;
-    if (category == 'Mobile') {
-      return program.title.toLowerCase().contains('flutter') ||
-          program.title.toLowerCase().contains('android') ||
-          program.title.toLowerCase().contains('mobile');
-    }
-    if (category == 'Design') {
-      return program.title.toLowerCase().contains('design') ||
-          program.title.toLowerCase().contains('ux');
-    }
-    if (category == 'Data') {
-      return program.title.toLowerCase().contains('data') ||
-          program.title.toLowerCase().contains('ai') ||
-          program.title.toLowerCase().contains('learning');
-    }
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,14 +68,20 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
                 p.description.toLowerCase().contains(
                   _searchQuery.toLowerCase(),
                 );
-            return matchesQuery && _matchesCategory(p, _selectedCategory);
+            return matchesQuery &&
+                ProgramUtils.matchesCategory(p, _selectedCategory);
           }).toList();
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                padding: const EdgeInsets.fromLTRB(
+                  AppConstants.paddingLarge,
+                  8,
+                  AppConstants.paddingLarge,
+                  0,
+                ),
                 child: TextField(
                   controller: _searchController,
                   focusNode: _focusNode,
@@ -94,12 +91,14 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
                     prefixIcon: const Icon(
                       Icons.search,
                       color: AppColors.textLight,
+                      size: 20,
                     ),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
                             icon: const Icon(
                               Icons.clear,
                               color: AppColors.textLight,
+                              size: 20,
                             ),
                             onPressed: () {
                               _searchController.clear();
@@ -112,9 +111,14 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
               ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                padding: const EdgeInsets.fromLTRB(
+                  AppConstants.paddingLarge,
+                  14,
+                  AppConstants.paddingLarge,
+                  6,
+                ),
                 child: Row(
-                  children: ['All', 'Mobile', 'Design', 'Data'].map((category) {
+                  children: _categories.map((category) {
                     final isSelected = _selectedCategory == category;
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
@@ -127,10 +131,10 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
                               ? Colors.white
                               : AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
-                          fontSize: 13,
+                          fontSize: 12,
                         ),
                         selectedColor: AppColors.primary,
-                        backgroundColor: const Color(0xfff8fafc),
+                        backgroundColor: AppColors.card,
                         side: BorderSide(
                           color: isSelected
                               ? AppColors.primary
@@ -146,34 +150,54 @@ class _ProgramListingScreenState extends State<ProgramListingScreen> {
                   }).toList(),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.paddingLarge,
+                ),
+                child: Text(
+                  '${filteredPrograms.length} program${filteredPrograms.length == 1 ? '' : 's'}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textLight,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
               Expanded(
                 child: filteredPrograms.isEmpty
                     ? const Center(
                         child: Text(
                           'No programs found',
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
                             color: AppColors.textSecondary,
                           ),
                         ),
                       )
-                    : ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppConstants.paddingLarge,
+                          0,
+                          AppConstants.paddingLarge,
+                          16,
+                        ),
                         itemCount: filteredPrograms.length,
-                        separatorBuilder: (_, _) => const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final program = filteredPrograms[index];
-                          return ProgramCard(
-                            program: program,
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ProgramDetailsScreen(
-                                    programId: program.id,
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: ProgramCard(
+                              program: program,
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ProgramDetailsScreen(
+                                      programId: program.id,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           );
                         },
                       ),

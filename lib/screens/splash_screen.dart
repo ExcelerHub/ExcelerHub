@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../utils/constants.dart';
+import '../widgets/app_logo.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _navigateToNext();
   }
 
-  void _navigateToNext() async {
+  Future<void> _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       Navigator.of(context).pushReplacement(
@@ -29,34 +30,32 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(16),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const AppLogo(size: 72, showTagline: true),
+              const SizedBox(height: 32),
+              const SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: AppColors.primary,
+                ),
               ),
-              child: const Icon(
-                Icons.school_outlined,
-                color: AppColors.primary,
-                size: 36,
+              const SizedBox(height: 12),
+              Text(
+                AppConstants.appDescription,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textLight,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              AppConstants.appName,
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

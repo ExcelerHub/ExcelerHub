@@ -5,14 +5,13 @@ import '../utils/app_colors.dart';
 import '../utils/constants.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_button.dart';
+import '../widgets/skill_chip.dart';
+import 'feedback_screen.dart';
 
 class ProgramDetailsScreen extends StatelessWidget {
   final String programId;
 
-  const ProgramDetailsScreen({
-    super.key,
-    required this.programId,
-  });
+  const ProgramDetailsScreen({super.key, required this.programId});
 
   @override
   Widget build(BuildContext context) {
@@ -22,110 +21,175 @@ class ProgramDetailsScreen extends StatelessWidget {
       body: ListenableBuilder(
         listenable: MockDatabase.instance,
         builder: (context, _) {
-          final program = MockDatabase.instance.programs.firstWhere((p) => p.id == programId);
+          final program =
+              MockDatabase.instance.programs.firstWhere((p) => p.id == programId);
           final user = AuthService.instance.currentUser;
-          final isJoined = user != null && user.joinedPrograms.contains(programId);
+          final isJoined =
+              user != null && user.joinedPrograms.contains(programId);
 
           return Column(
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        program.title,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                          height: 1.3,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(
+                            AppConstants.borderRadiusCard,
+                          ),
+                          bottomRight: Radius.circular(
+                            AppConstants.borderRadiusCard,
+                          ),
+                        ),
                         child: AspectRatio(
-                          aspectRatio: 16 / 9,
+                          aspectRatio: 16 / 7,
                           child: Image.network(
                             program.imageUrl ?? AppConstants.placeholderImageUrl,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
-                                color: const Color(0xfff1f5f9),
+                                color: AppColors.secondary.withValues(
+                                  alpha: 0.15,
+                                ),
                                 child: const Icon(
                                   Icons.image_outlined,
-                                  size: 48,
-                                  color: AppColors.textLight,
+                                  size: 40,
+                                  color: AppColors.primary,
                                 ),
                               );
                             },
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      const _SectionLabel('Description'),
-                      const SizedBox(height: 8),
-                      Text(
-                        program.description,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: AppColors.textSecondary,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const _SectionLabel('Duration'),
-                      const SizedBox(height: 8),
-                      Text(
-                        program.duration,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const _SectionLabel('Eligibility'),
-                      const SizedBox(height: 8),
-                      Text(
-                        program.eligibility,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: AppColors.textSecondary,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const _SectionLabel('Learning Outcomes'),
-                      const SizedBox(height: 12),
-                      ...program.learningOutcomes.map(
-                        (outcome) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.only(top: 6),
-                                child: Icon(
-                                  Icons.circle,
-                                  size: 6,
-                                  color: AppColors.primary,
-                                ),
+                      Padding(
+                        padding: const EdgeInsets.all(AppConstants.paddingLarge),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              program.title,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                                height: 1.3,
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  outcome,
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.schedule_outlined,
+                                  size: 14,
+                                  color: AppColors.textLight,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  program.duration,
                                   style: const TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 13,
                                     color: AppColors.textSecondary,
-                                    height: 1.4,
                                   ),
                                 ),
+                                const SizedBox(width: 16),
+                                const Icon(
+                                  Icons.calendar_today_outlined,
+                                  size: 14,
+                                  color: AppColors.textLight,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  program.startDate,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            const _SectionLabel('Description'),
+                            const SizedBox(height: 6),
+                            Text(
+                              program.description,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.textSecondary,
+                                height: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            const _SectionLabel('Eligibility'),
+                            const SizedBox(height: 6),
+                            Text(
+                              program.eligibility,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.textSecondary,
+                                height: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            const _SectionLabel("Skills You'll Learn"),
+                            const SizedBox(height: 10),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: program.skills
+                                  .map((skill) => SkillChip(label: skill))
+                                  .toList(),
+                            ),
+                            const SizedBox(height: 20),
+                            const _SectionLabel('Learning Outcomes'),
+                            const SizedBox(height: 10),
+                            ...program.learningOutcomes.map(
+                              (outcome) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(top: 6),
+                                      child: Icon(
+                                        Icons.check_circle_outline,
+                                        size: 14,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        outcome,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.textSecondary,
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            if (isJoined) ...[
+                              const SizedBox(height: 12),
+                              TextButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => FeedbackScreen(
+                                        programName: program.title,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.rate_review_outlined, size: 18),
+                                label: const Text('Submit Feedback'),
                               ),
                             ],
-                          ),
+                          ],
                         ),
                       ),
                     ],
@@ -135,18 +199,27 @@ class ProgramDetailsScreen extends StatelessWidget {
               SafeArea(
                 top: false,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppConstants.paddingLarge,
+                    8,
+                    AppConstants.paddingLarge,
+                    16,
+                  ),
                   child: CustomButton(
-                    text: isJoined ? 'Registered' : 'Register',
+                    text: isJoined ? 'Joined' : 'Join Program',
                     onPressed: isJoined || user == null
                         ? null
                         : () {
-                            final success =
-                                MockDatabase.instance.joinProgram(user.id, programId);
+                            final success = MockDatabase.instance.joinProgram(
+                              user.id,
+                              programId,
+                            );
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Registered for ${program.title}'),
+                                  content: Text(
+                                    'You joined ${program.title}',
+                                  ),
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
@@ -173,7 +246,7 @@ class _SectionLabel extends StatelessWidget {
     return Text(
       label,
       style: const TextStyle(
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),
