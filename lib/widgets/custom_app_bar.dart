@@ -20,36 +20,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final canPop = Navigator.canPop(context);
 
     return AppBar(
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          color: AppColors.textPrimary,
-          fontSize: 18,
-        ),
-      ),
-      centerTitle: true,
+      title: Text(title),
       backgroundColor: backgroundColor ?? Colors.white,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
+      scrolledUnderElevation: 0,
       leading: showBackButton && canPop
           ? IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                color: AppColors.textPrimary,
-                size: 18,
-              ),
+              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
               onPressed: () => Navigator.maybePop(context),
             )
           : null,
       actions: actions,
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1.0),
-        child: Container(
-          color: Colors.grey.shade100,
-          height: 1.0,
-        ),
-      ),
     );
   }
 

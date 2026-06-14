@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/program_model.dart';
 import '../utils/app_colors.dart';
-import '../utils/constants.dart';
-import 'skill_chip.dart';
 
 class ProgramCard extends StatelessWidget {
   final ProgramModel program;
@@ -16,139 +14,82 @@ class ProgramCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      clipBehavior: Clip.antiAlias,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
-        side: BorderSide(color: Colors.grey.shade100, width: 1.5),
-      ),
+    return Material(
+      color: Colors.white,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image Placeholder/Thumbnail
-            Stack(
-              children: [
-                Container(
-                  height: 140,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                  ),
-                  child: Image.network(
-                    program.imageUrl ?? AppConstants.placeholderImageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: AppColors.primary.withOpacity(0.05),
-                        child: const Icon(
-                          Icons.laptop_chromebook,
-                          size: 50,
-                          color: AppColors.primary,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      program.duration,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      program.title,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        height: 1.3,
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-            
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    program.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  
-                  // Start Date & Mentor Info
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textSecondary),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Starts: ${program.startDate}',
-                        style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                    const SizedBox(height: 6),
+                    Text(
+                      program.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textSecondary,
+                        height: 1.4,
                       ),
-                      const Spacer(),
-                      const Icon(Icons.person_outline, size: 14, color: AppColors.textSecondary),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          program.mentor.split(' ').first,
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.schedule_outlined,
+                          size: 14,
+                          color: AppColors.textLight,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          program.duration,
                           style: const TextStyle(
-                            fontSize: 13, 
+                            fontSize: 13,
                             color: AppColors.textSecondary,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  // Skill tags Wrap
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: program.skills.take(3).map((skill) => SkillChip(label: skill)).toList(),
-                  ),
-                  const SizedBox(height: 16),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: OutlinedButton.icon(
-                      onPressed: onTap,
-                      icon: const Icon(Icons.arrow_forward, size: 18),
-                      label: const Text(
-                        'View Details',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+                        const SizedBox(width: 16),
+                        const Icon(
+                          Icons.calendar_today_outlined,
+                          size: 14,
+                          color: AppColors.textLight,
                         ),
-                      ),
+                        const SizedBox(width: 4),
+                        Text(
+                          program.startDate,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.textLight,
+                size: 22,
+              ),
+            ],
+          ),
         ),
       ),
     );

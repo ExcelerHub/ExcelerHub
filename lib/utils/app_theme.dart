@@ -18,35 +18,34 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.white,
         elevation: 0,
-        centerTitle: true,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
         iconTheme: IconThemeData(color: AppColors.textPrimary),
         titleTextStyle: TextStyle(
           color: AppColors.textPrimary,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
           fontFamily: 'Roboto',
         ),
       ),
-      cardTheme: CardThemeData(
-        color: AppColors.cardBg,
-        elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.04),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
-        ),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.divider,
+        thickness: 1,
+        space: 1,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          minimumSize: const Size(double.infinity, 52),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontFamily: 'Roboto',
           ),
         ),
@@ -54,14 +53,15 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary, width: 1.5),
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          side: const BorderSide(color: AppColors.divider),
+          minimumSize: const Size(double.infinity, 52),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
           ),
           textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
             fontFamily: 'Roboto',
           ),
         ),
@@ -78,7 +78,9 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: Colors.white,
-        indicatorColor: AppColors.primary.withOpacity(0.12),
+        elevation: 0,
+        indicatorColor: AppColors.primary.withValues(alpha: 0.1),
+        height: 64,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const TextStyle(
@@ -102,15 +104,15 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        fillColor: const Color(0xfff8fafc),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-          borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+          borderSide: const BorderSide(color: AppColors.divider),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-          borderSide: BorderSide(color: Colors.grey.shade200, width: 1),
+          borderSide: const BorderSide(color: AppColors.divider),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
@@ -118,10 +120,14 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-          borderSide: const BorderSide(color: AppColors.error, width: 1),
+          borderSide: const BorderSide(color: AppColors.error),
         ),
         labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
         hintStyle: const TextStyle(color: AppColors.textLight, fontSize: 14),
+      ),
+      listTileTheme: const ListTileThemeData(
+        contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 4),
+        minVerticalPadding: 12,
       ),
     );
   }

@@ -16,6 +16,5 @@ void main() {
 
     // Verify that our splash screen starts with app name and tagline
     expect(find.text('ExcelerHub'), findsOneWidget);
-    expect(find.text('Learn • Grow • Connect'), findsOneWidget);
   });
 }

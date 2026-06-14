@@ -22,22 +22,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+      setState(() => _isLoading = true);
 
-      // Simulate a small delay for premium UX feel
-      Future.delayed(const Duration(milliseconds: 800), () {
+      Future.delayed(const Duration(milliseconds: 600), () {
         if (!mounted) return;
-        
+
         final success = AuthService.instance.login(
           _emailController.text,
           _passwordController.text,
         );
 
-        setState(() {
-          _isLoading = false;
-        });
+        setState(() => _isLoading = false);
 
         if (success) {
           Navigator.of(context).pushAndRemoveUntil(
@@ -69,136 +64,110 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight,
-                ),
-                child: IntrinsicHeight(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Spacer(flex: 1),
-                        
-                        // Header Logo & Text
-                        Center(
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.school,
-                                  color: AppColors.primary,
-                                  size: 48,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                AppConstants.appName,
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              const Text(
-                                'Sign in to your learning dashboard',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        
-                        // Email Textfield
-                        CustomTextField(
-                          labelText: 'Email Address',
-                          hintText: 'name@example.com',
-                          prefixIcon: Icons.email_outlined,
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Email is required';
-                            }
-                            final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                            if (!emailRegExp.hasMatch(value.trim())) {
-                              return 'Enter a valid email address';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        
-                        // Password Textfield
-                        CustomTextField(
-                          labelText: 'Password',
-                          hintText: 'Enter your password',
-                          prefixIcon: Icons.lock_outline,
-                          controller: _passwordController,
-                          isPassword: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Password is required';
-                            }
-                            if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 32),
-                        
-                        // Submit Button
-                        CustomButton(
-                          text: 'Login',
-                          isLoading: _isLoading,
-                          onPressed: _handleLogin,
-                        ),
-                        
-                        const Spacer(flex: 2),
-                        
-                        // Bottom Navigation to Register
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              "Don't have an account?",
-                              style: TextStyle(color: AppColors.textSecondary),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => const RegisterScreen(),
-                                  ),
-                                );
-                              },
-                              child: const Text('Register'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.12),
+                Center(
+                  child: Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      Icons.school_outlined,
+                      color: AppColors.primary,
+                      size: 32,
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+                const SizedBox(height: 24),
+                const Text(
+                  AppConstants.appName,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Welcome back',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                CustomTextField(
+                  labelText: 'Email',
+                  hintText: 'name@example.com',
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Email is required';
+                    }
+                    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                    if (!emailRegExp.hasMatch(value.trim())) {
+                      return 'Enter a valid email address';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  labelText: 'Password',
+                  hintText: 'Enter your password',
+                  controller: _passwordController,
+                  isPassword: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Password is required';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 32),
+                CustomButton(
+                  text: 'Login',
+                  isLoading: _isLoading,
+                  onPressed: _handleLogin,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don't have an account?",
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text('Register'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

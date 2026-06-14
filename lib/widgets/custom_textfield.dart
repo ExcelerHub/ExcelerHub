@@ -4,7 +4,7 @@ import '../utils/app_colors.dart';
 class CustomTextField extends StatefulWidget {
   final String labelText;
   final String hintText;
-  final IconData prefixIcon;
+  final IconData? prefixIcon;
   final bool isPassword;
   final TextInputType keyboardType;
   final FormFieldValidator<String>? validator;
@@ -14,7 +14,7 @@ class CustomTextField extends StatefulWidget {
     super.key,
     required this.labelText,
     required this.hintText,
-    required this.prefixIcon,
+    this.prefixIcon,
     required this.controller,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
@@ -59,7 +59,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ),
           decoration: InputDecoration(
             hintText: widget.hintText,
-            prefixIcon: Icon(widget.prefixIcon, color: AppColors.textSecondary, size: 20),
+            prefixIcon: widget.prefixIcon != null
+                ? Icon(widget.prefixIcon, color: AppColors.textSecondary, size: 20)
+                : null,
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(

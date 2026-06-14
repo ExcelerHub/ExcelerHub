@@ -21,13 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => const LoginScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 500),
-        ),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     }
   }
@@ -35,68 +29,34 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: AppColors.primaryGradient,
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo
-              TweenAnimationBuilder<double>(
-                duration: const Duration(seconds: 1),
-                tween: Tween<double>(begin: 0.0, end: 1.0),
-                builder: (context, value, child) {
-                  return Transform.scale(
-                    scale: value,
-                    child: Opacity(
-                      opacity: value,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.school_outlined,
-                    color: Colors.white,
-                    size: 72,
-                  ),
-                ),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
               ),
-              const SizedBox(height: 24),
-              
-              // App Name
-              const Text(
-                AppConstants.appName,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
-                ),
+              child: const Icon(
+                Icons.school_outlined,
+                color: AppColors.primary,
+                size: 36,
               ),
-              const SizedBox(height: 8),
-              
-              // Tagline
-              const Text(
-                AppConstants.appTagline,
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 1.2,
-                ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              AppConstants.appName,
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
