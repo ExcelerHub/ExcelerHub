@@ -16,7 +16,23 @@ class ExcelerHubApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const SplashScreen(),
+      home: const _ResponsiveWrapper(child: SplashScreen()),
+    );
+  }
+}
+
+class _ResponsiveWrapper extends StatelessWidget {
+  final Widget child;
+
+  const _ResponsiveWrapper({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 430),
+        child: child,
+      ),
     );
   }
 }

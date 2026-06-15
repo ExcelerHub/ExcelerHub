@@ -19,6 +19,7 @@ class ProgramCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final category = ProgramUtils.getCategory(program);
+    final icon = ProgramUtils.getProgramIcon(program);
 
     return Material(
       color: AppColors.card,
@@ -35,6 +36,20 @@ class ProgramCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: AppColors.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -3,6 +3,7 @@ import '../services/auth_service.dart';
 import '../services/mock_database.dart';
 import '../utils/app_colors.dart';
 import '../utils/constants.dart';
+import '../utils/program_utils.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/skill_chip.dart';
@@ -26,6 +27,7 @@ class ProgramDetailsScreen extends StatelessWidget {
           final user = AuthService.instance.currentUser;
           final isJoined =
               user != null && user.joinedPrograms.contains(programId);
+          final icon = ProgramUtils.getProgramIcon(program);
 
           return Column(
             children: [
@@ -34,33 +36,80 @@ class ProgramDetailsScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(
-                            AppConstants.borderRadiusCard,
-                          ),
-                          bottomRight: Radius.circular(
-                            AppConstants.borderRadiusCard,
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppConstants.paddingLarge),
+                        decoration: BoxDecoration(
+                          color: AppColors.card,
+                          border: Border(
+                            bottom: BorderSide(color: AppColors.divider),
                           ),
                         ),
-                        child: AspectRatio(
-                          aspectRatio: 16 / 7,
-                          child: Image.network(
-                            program.imageUrl ?? AppConstants.placeholderImageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: AppColors.secondary.withValues(
-                                  alpha: 0.15,
-                                ),
-                                child: const Icon(
-                                  Icons.image_outlined,
-                                  size: 40,
-                                  color: AppColors.primary,
-                                ),
-                              );
-                            },
-                          ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                icon,
+                                color: AppColors.primary,
+                                size: 32,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    program.title,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.textPrimary,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.schedule_outlined,
+                                        size: 13,
+                                        color: AppColors.textLight,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        program.duration,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Icon(
+                                        Icons.calendar_today_outlined,
+                                        size: 13,
+                                        color: AppColors.textLight,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        program.startDate,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Padding(
@@ -68,48 +117,6 @@ class ProgramDetailsScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              program.title,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                                height: 1.3,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.schedule_outlined,
-                                  size: 14,
-                                  color: AppColors.textLight,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  program.duration,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                const Icon(
-                                  Icons.calendar_today_outlined,
-                                  size: 14,
-                                  color: AppColors.textLight,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  program.startDate,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
                             const _SectionLabel('Description'),
                             const SizedBox(height: 6),
                             Text(
