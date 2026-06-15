@@ -151,3 +151,18 @@ To preserve clean release tracking, use the following chronological commit struc
 * **Push Notifications**: Integrate Firebase Cloud Messaging (FCM) for deadline reminders.
 * **Document Upload**: Support uploading PDFs/GitHub repository links for assignment task completions.
 * **Calendar Syncing**: Auto-add mentor meetings to user Google/Apple Calendar.
+
+
+## Week 2 Screenshots
+
+### Login Screen
+![Login Screen](screenshots/login.png)
+
+### Home Screen
+![Home Screen](screenshots/home.png)
+
+### Program Listing Screen
+![Program Listing](screenshots/program_listing.png)
+
+### Program Details Screen
+![Program Details](screenshots/program_details.png)
