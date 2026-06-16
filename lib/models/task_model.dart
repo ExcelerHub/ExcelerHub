@@ -4,6 +4,7 @@ class TaskModel {
   final String title;
   final bool isCompleted;
   final String? programId; // Optional link to program
+  final String dueDate;
 
   TaskModel({
     required this.id,
@@ -11,6 +12,7 @@ class TaskModel {
     required this.title,
     required this.isCompleted,
     this.programId,
+    required this.dueDate,
   });
 
   TaskModel copyWith({
@@ -19,6 +21,7 @@ class TaskModel {
     String? title,
     bool? isCompleted,
     String? programId,
+    String? dueDate,
   }) {
     return TaskModel(
       id: id ?? this.id,
@@ -26,6 +29,7 @@ class TaskModel {
       title: title ?? this.title,
       isCompleted: isCompleted ?? this.isCompleted,
       programId: programId ?? this.programId,
+      dueDate: dueDate ?? this.dueDate,
     );
   }
 
@@ -36,6 +40,7 @@ class TaskModel {
       'title': title,
       'isCompleted': isCompleted,
       'programId': programId,
+      'dueDate': dueDate,
     };
   }
 
@@ -46,6 +51,7 @@ class TaskModel {
       title: map['title'] ?? '',
       isCompleted: map['isCompleted'] ?? false,
       programId: map['programId'],
+      dueDate: map['dueDate'] ?? 'In 3 days',
     );
   }
 }

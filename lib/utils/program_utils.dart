@@ -5,13 +5,13 @@ class ProgramUtils {
   static IconData getProgramIcon(ProgramModel program) {
     final title = program.title.toLowerCase();
     if (title.contains('flutter') || title.contains('mobile')) {
-      return Icons.phone_android_rounded;
+      return Icons.flutter_dash;
     }
     if (title.contains('ai') || title.contains('machine learning')) {
       return Icons.psychology_rounded;
     }
     if (title.contains('security') || title.contains('cyber')) {
-      return Icons.security_rounded;
+      return Icons.shield_rounded;
     }
     if (title.contains('data') || title.contains('science') || title.contains('analytics')) {
       return Icons.analytics_rounded;

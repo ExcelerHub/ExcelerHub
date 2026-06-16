@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../utils/app_colors.dart';
-import '../utils/constants.dart';
 import '../widgets/app_logo.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
@@ -72,9 +71,22 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.08),
-                const Center(child: AppLogo(size: 64, showTagline: true)),
-                const SizedBox(height: 36),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.12),
+                // Logo
+                const Center(child: AppLogo(size: 64, showText: true, showTagline: false)),
+                const SizedBox(height: 12),
+                // Welcome text
+                const Text(
+                  'Welcome Back',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // Email field
                 CustomTextField(
                   labelText: 'Email',
                   hintText: 'name@example.com',
@@ -93,6 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
+                // Password field
                 CustomTextField(
                   labelText: 'Password',
                   hintText: 'Enter your password',
@@ -109,12 +122,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 const SizedBox(height: 28),
+                // Login button
                 CustomButton(
                   text: 'Login',
                   isLoading: _isLoading,
                   onPressed: _handleLogin,
                 ),
                 const SizedBox(height: 20),
+                // Register link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -133,15 +148,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text('Register'),
                     ),
                   ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  AppConstants.appDescription,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textLight,
-                  ),
                 ),
               ],
             ),

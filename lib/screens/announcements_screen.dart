@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../services/mock_database.dart';
 import '../utils/app_colors.dart';
 import '../utils/constants.dart';
-import '../widgets/announcement_card.dart';
 import '../widgets/custom_app_bar.dart';
 
 class AnnouncementsScreen extends StatefulWidget {
@@ -26,26 +25,9 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         title: 'Announcements',
         showBackButton: false,
-        actions: [
-          Container(
-            width: 40,
-            height: 40,
-            margin: const EdgeInsets.only(right: 8),
-            decoration: BoxDecoration(
-              color: AppColors.card,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.divider),
-            ),
-            child: const Icon(
-              Icons.notifications_outlined,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-          ),
-        ],
       ),
       body: ListenableBuilder(
         listenable: MockDatabase.instance,
@@ -101,7 +83,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                           ),
                         ),
                       )
-                    : ListView.builder(
+                    : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(
                           AppConstants.paddingLarge,
                           0,
@@ -109,12 +91,49 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                           24,
                         ),
                         itemCount: announcements.length,
+                        separatorBuilder: (context, index) => const Divider(
+                          color: AppColors.divider,
+                          height: 24,
+                        ),
                         itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: AnnouncementCard(
-                              announcement: announcements[index],
-                            ),
+                          final a = announcements[index];
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      a.title,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    a.date,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textLight,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                a.content,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.textSecondary,
+                                  height: 1.45,
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),

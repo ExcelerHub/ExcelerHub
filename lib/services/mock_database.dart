@@ -73,17 +73,6 @@ class MockDatabase extends ChangeNotifier {
 
     _users.add(newUser);
     
-    // Auto-create standard tasks for the user (general onboarding tasks)
-    final templates = getTaskTemplates();
-    for (int i = 0; i < templates.length; i++) {
-      _tasks.add(TaskModel(
-        id: 'task_${_tasks.length + 1}',
-        userId: newId,
-        title: templates[i],
-        isCompleted: i < 1, // first task (Environment Setup) is done by default for visual balance
-      ));
-    }
-
     notifyListeners();
     return newUser;
   }
@@ -134,15 +123,65 @@ class MockDatabase extends ChangeNotifier {
 
     // Dynamic tasks for this program
     final templates = getTaskTemplates();
-    for (var title in templates) {
+    for (int i = 0; i < templates.length; i++) {
+      final title = templates[i];
+      String dueDate;
+      if (i == 0) {
+        dueDate = 'In 2 days';
+      } else if (i == 1) {
+        dueDate = 'In 5 days';
+      } else if (i == 2) {
+        dueDate = 'In 1 week';
+      } else if (i == 3) {
+        dueDate = 'In 2 weeks';
+      } else {
+        dueDate = 'In 3 weeks';
+      }
+
       _tasks.add(TaskModel(
         id: 'task_${_tasks.length + 1}',
         userId: userId,
         title: '$title (${program.title.split(' ').first})',
         isCompleted: false,
         programId: programId,
+        dueDate: dueDate,
       ));
     }
+
+    notifyListeners();
+    return true;
+  }
+
+  bool leaveProgram(String userId, String programId) {
+    final userIndex = _users.indexWhere((u) => u.id == userId);
+    final progIndex = _programs.indexWhere((p) => p.id == programId);
+
+    if (userIndex == -1 || progIndex == -1) return false;
+
+    final user = _users[userIndex];
+    final program = _programs[progIndex];
+
+    // Remove enrollment status and reset associated progress
+    final updatedJoinedPrograms = List<String>.from(user.joinedPrograms)..remove(programId);
+    final updatedCompletedPrograms = List<String>.from(user.completedPrograms)..remove(programId);
+
+    // Remove achievements related to this program
+    final firstWord = program.title.split(' ').first;
+    final achievements = List<String>.from(user.achievements)
+      ..removeWhere((a) => a.contains(firstWord) || a.contains(program.title));
+
+    _users[userIndex] = user.copyWith(
+      joinedPrograms: updatedJoinedPrograms,
+      completedPrograms: updatedCompletedPrograms,
+      achievements: achievements.toSet().toList(),
+    );
+
+    // Update Program joinedUsers
+    final updatedJoinedUsers = List<String>.from(program.joinedUsers)..remove(userId);
+    _programs[progIndex] = program.copyWith(joinedUsers: updatedJoinedUsers);
+
+    // Remove all associated tasks
+    _tasks.removeWhere((t) => t.userId == userId && t.programId == programId);
 
     notifyListeners();
     return true;

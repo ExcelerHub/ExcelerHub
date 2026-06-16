@@ -20,15 +20,8 @@ class AuthService extends ChangeNotifier {
     if (_currentUser != null) {
       try {
         final dbUser = MockDatabase.instance.users.firstWhere((u) => u.id == _currentUser!.id);
-        if (dbUser.name != _currentUser!.name ||
-            dbUser.email != _currentUser!.email ||
-            dbUser.joinedPrograms.length != _currentUser!.joinedPrograms.length ||
-            dbUser.completedPrograms.length != _currentUser!.completedPrograms.length ||
-            dbUser.achievements.length != _currentUser!.achievements.length ||
-            dbUser.skills.length != _currentUser!.skills.length) {
-          _currentUser = dbUser;
-          notifyListeners();
-        }
+        _currentUser = dbUser;
+        notifyListeners();
       } catch (_) {
         // user was deleted or not found
         _currentUser = null;
