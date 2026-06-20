@@ -232,59 +232,6 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         );
                       }),
-                    const SizedBox(height: 24),
-                    const SectionHeader(title: 'Achievements'),
-                    const SizedBox(height: 10),
-                    if (user.achievements.isEmpty)
-                      const Text(
-                        'Complete programs to earn achievements.',
-                        style: TextStyle(
-                          color: AppColors.textSecondary,
-                          fontSize: 13,
-                        ),
-                      )
-                    else
-                      ...user.achievements.map(
-                        (achievement) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: AppCard(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.secondary.withValues(
-                                      alpha: 0.15,
-                                    ),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Icon(
-                                    Icons.emoji_events_outlined,
-                                    color: AppColors.primary,
-                                    size: 18,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    achievement,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.textPrimary,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                     const SizedBox(height: 28),
                     CustomButton(
                       text: 'Log out',

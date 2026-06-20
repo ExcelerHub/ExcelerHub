@@ -14,6 +14,43 @@ class ProgramDetailsScreen extends StatelessWidget {
 
   const ProgramDetailsScreen({super.key, required this.programId});
 
+  void _showLeaveConfirmation(BuildContext context, String userId, String programTitle) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Leave Program?'),
+        content: const Text(
+          'Are you sure you want to leave this program?\n\n'
+          'You may lose access to progress tracking, tasks, and related learning activities.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              final success = MockDatabase.instance.leaveProgram(userId, programId);
+              if (success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('You left $programTitle'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+            child: const Text(
+              'Leave Program',
+              style: TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,187 +59,172 @@ class ProgramDetailsScreen extends StatelessWidget {
       body: ListenableBuilder(
         listenable: MockDatabase.instance,
         builder: (context, _) {
-          final program =
-              MockDatabase.instance.programs.firstWhere((p) => p.id == programId);
+          final program = MockDatabase.instance.programs.firstWhere((p) => p.id == programId);
           final user = AuthService.instance.currentUser;
-          final isJoined =
-              user != null && user.joinedPrograms.contains(programId);
+          final isJoined = user != null && user.joinedPrograms.contains(programId);
           final icon = ProgramUtils.getProgramIcon(program);
 
           return Column(
             children: [
               Expanded(
                 child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppConstants.paddingLarge),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(AppConstants.paddingLarge),
-                        decoration: BoxDecoration(
-                          color: AppColors.card,
-                          border: Border(
-                            bottom: BorderSide(color: AppColors.divider),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 64,
-                              height: 64,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                icon,
-                                color: AppColors.primary,
-                                size: 32,
-                              ),
+                      // Header: Icon, Title, Duration, Enrolled Badge
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.08),
+                              shape: BoxShape.circle,
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    program.title,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.textPrimary,
-                                      height: 1.3,
-                                    ),
+                            child: Icon(
+                              icon,
+                              color: AppColors.primary,
+                              size: 26,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  program.title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                    height: 1.3,
                                   ),
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.schedule_outlined,
-                                        size: 13,
-                                        color: AppColors.textLight,
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.schedule_outlined,
+                                      size: 13,
+                                      color: AppColors.textLight,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      program.duration,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondary,
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        program.duration,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
-                                        ),
-                                      ),
+                                    ),
+                                    if (isJoined) ...[
                                       const SizedBox(width: 12),
-                                      const Icon(
-                                        Icons.calendar_today_outlined,
-                                        size: 13,
-                                        color: AppColors.textLight,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        program.startDate,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textSecondary,
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.success.withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: const Text(
+                                          'Enrolled',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.success,
+                                          ),
                                         ),
                                       ),
                                     ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(AppConstants.paddingLarge),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const _SectionLabel('Description'),
-                            const SizedBox(height: 6),
-                            Text(
-                              program.description,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                                height: 1.5,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            const _SectionLabel('Eligibility'),
-                            const SizedBox(height: 6),
-                            Text(
-                              program.eligibility,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                                height: 1.5,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            const _SectionLabel("Skills You'll Learn"),
-                            const SizedBox(height: 10),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: program.skills
-                                  .map((skill) => SkillChip(label: skill))
-                                  .toList(),
-                            ),
-                            const SizedBox(height: 20),
-                            const _SectionLabel('Learning Outcomes'),
-                            const SizedBox(height: 10),
-                            ...program.learningOutcomes.map(
-                              (outcome) => Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.only(top: 6),
-                                      child: Icon(
-                                        Icons.check_circle_outline,
-                                        size: 14,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        outcome,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: AppColors.textSecondary,
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                    ),
                                   ],
                                 ),
-                              ),
+                              ],
                             ),
-                            if (isJoined) ...[
-                              const SizedBox(height: 12),
-                              TextButton.icon(
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => FeedbackScreen(
-                                        programName: program.title,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(Icons.rate_review_outlined, size: 18),
-                                label: const Text('Submit Feedback'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Description Section
+                      const _SectionLabel('Description'),
+                      const SizedBox(height: 6),
+                      Text(
+                        program.description,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Skills Section
+                      const _SectionLabel("Skills You'll Learn"),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: program.skills
+                            .map((skill) => SkillChip(label: skill))
+                            .toList(),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Eligibility Section
+                      const _SectionLabel('Eligibility'),
+                      const SizedBox(height: 6),
+                      Text(
+                        program.eligibility,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Outcomes Section
+                      const _SectionLabel('Learning Outcomes'),
+                      const SizedBox(height: 8),
+                      ...program.learningOutcomes.map(
+                        (outcome) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 4),
+                                child: Icon(
+                                  Icons.check_circle_outline,
+                                  size: 14,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  outcome,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.textSecondary,
+                                    height: 1.4,
+                                  ),
+                                ),
                               ),
                             ],
-                          ],
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
+              
+              // Enrollment buttons at the bottom
               SafeArea(
                 top: false,
                 child: Padding(
@@ -212,26 +234,51 @@ class ProgramDetailsScreen extends StatelessWidget {
                     AppConstants.paddingLarge,
                     16,
                   ),
-                  child: CustomButton(
-                    text: isJoined ? 'Joined' : 'Join Program',
-                    onPressed: isJoined || user == null
-                        ? null
-                        : () {
-                            final success = MockDatabase.instance.joinProgram(
-                              user.id,
-                              programId,
-                            );
-                            if (success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'You joined ${program.title}',
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (!isJoined)
+                        CustomButton(
+                          text: 'Join Program',
+                          onPressed: user == null
+                              ? null
+                              : () {
+                                  final success = MockDatabase.instance.joinProgram(
+                                    user.id,
+                                    programId,
+                                  );
+                                  if (success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('You joined ${program.title}'),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  }
+                                },
+                        )
+                      else ...[
+                        CustomButton(
+                          text: 'Give Feedback',
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => FeedbackScreen(
+                                  programName: program.title,
                                 ),
-                              );
-                            }
+                              ),
+                            );
                           },
+                        ),
+                        const SizedBox(height: 8),
+                        CustomButton(
+                          text: 'Leave Program',
+                          isSecondary: true,
+                          onPressed: () => _showLeaveConfirmation(context, user.id, program.title),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ),

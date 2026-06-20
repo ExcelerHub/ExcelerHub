@@ -4,7 +4,6 @@ import 'announcements_screen.dart';
 import 'dashboard_screen.dart';
 import 'profile_screen.dart';
 import 'program_listing_screen.dart';
-import 'task_tracker_screen.dart';
 
 class MainShell extends StatefulWidget {
   final int initialIndex;
@@ -50,7 +49,6 @@ class _MainShellState extends State<MainShell> {
               }
             },
           ),
-          const TaskTrackerScreen(),
           const AnnouncementsScreen(),
           const ProfileScreen(),
         ],
@@ -72,11 +70,6 @@ class _MainShellState extends State<MainShell> {
             icon: Icon(Icons.school_outlined),
             selectedIcon: Icon(Icons.school_rounded),
             label: 'Programs',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.task_alt_outlined),
-            selectedIcon: Icon(Icons.task_alt_rounded),
-            label: 'Tasks',
           ),
           NavigationDestination(
             icon: Icon(Icons.campaign_outlined),

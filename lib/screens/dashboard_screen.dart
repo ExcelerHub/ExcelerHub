@@ -3,12 +3,9 @@ import '../services/auth_service.dart';
 import '../services/mock_database.dart';
 import '../utils/app_colors.dart';
 import '../utils/constants.dart';
-import '../widgets/announcement_card.dart';
 import '../widgets/app_card.dart';
-import '../widgets/program_card.dart';
-import '../widgets/section_header.dart';
-import '../widgets/task_tile.dart';
 import 'program_details_screen.dart';
+import 'task_tracker_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   final void Function(int index, {bool autoFocusProgramsSearch})? onTabSelected;
@@ -42,19 +39,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           builder: (context, _) {
             final db = MockDatabase.instance;
             final programs = db.programs;
-            final enrolledPrograms = programs
-                .where((p) => user.joinedPrograms.contains(p.id))
-                .toList();
-            final continueProgram = enrolledPrograms.isNotEmpty
-                ? enrolledPrograms.first
-                : (programs.isNotEmpty ? programs.first : null);
-            final previewPrograms = programs.take(2).toList();
-            final previewAnnouncements = db.announcements.take(2).toList();
-            final pendingTasks = db
-                .getTasksForUser(user.id)
-                .where((t) => !t.isCompleted)
-                .take(2)
-                .toList();
+            
+            // Featured program is the first program in the list
+            final featuredProgram = programs.isNotEmpty ? programs.first : null;
+            
+            // Get 2 recent announcements
+            final recentAnnouncements = db.announcements.take(2).toList();
 
             return Scaffold(
               backgroundColor: AppColors.background,
@@ -62,58 +52,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(
                     AppConstants.paddingLarge,
-                    12,
+                    16,
                     AppConstants.paddingLarge,
                     24,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // Welcome Message
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Welcome to ExcelerHub',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                user.name.split(' ').first,
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            width: 42,
-                            height: 42,
-                            decoration: BoxDecoration(
-                              color: AppColors.card,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.divider),
-                            ),
-                            child: const Icon(
-                              Icons.notifications_outlined,
+                          const Text(
+                            'Welcome back,',
+                            style: TextStyle(
+                              fontSize: 14,
                               color: AppColors.textSecondary,
-                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            user.name,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
 
+                      // Search Bar
                       GestureDetector(
-                        onTap: () =>
-                            _goToTab(1, autoFocusProgramsSearch: true),
+                        onTap: () => _goToTab(1, autoFocusProgramsSearch: true),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 14,
@@ -147,15 +119,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      if (continueProgram != null) ...[
-                        const SectionHeader(title: 'Continue Learning'),
+                      // Quick Navigation Buttons
+                      const Text(
+                        'Quick Links',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildQuickLink(
+                            context: context,
+                            icon: Icons.task_alt_rounded,
+                            label: 'My Tasks',
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const TaskTrackerScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          _buildQuickLink(
+                            context: context,
+                            icon: Icons.school_rounded,
+                            label: 'Programs',
+                            onTap: () => _goToTab(1),
+                          ),
+                          _buildQuickLink(
+                            context: context,
+                            icon: Icons.campaign_rounded,
+                            label: 'Updates',
+                            onTap: () => _goToTab(2), // announcements tab index is now 2
+                          ),
+                          _buildQuickLink(
+                            context: context,
+                            icon: Icons.person_rounded,
+                            label: 'Profile',
+                            onTap: () => _goToTab(3), // profile tab index is now 3
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+
+                      // Featured Program Section
+                      if (featuredProgram != null) ...[
+                        const Text(
+                          'Featured Program',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 10),
                         AppCard(
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => ProgramDetailsScreen(
-                                  programId: continueProgram.id,
+                                  programId: featuredProgram.id,
                                 ),
                               ),
                             );
@@ -166,13 +193,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 width: 44,
                                 height: 44,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
+                                  color: AppColors.primary.withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
-                                  Icons.play_circle_outline,
+                                  Icons.star_rounded,
                                   color: AppColors.primary,
                                 ),
                               ),
@@ -182,7 +207,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      continueProgram.title,
+                                      featuredProgram.title,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
@@ -193,7 +218,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      continueProgram.duration,
+                                      featuredProgram.duration,
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: AppColors.textSecondary,
@@ -210,42 +235,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 28),
                       ],
 
-                      SectionHeader(
-                        title: 'Programs',
-                        actionLabel: 'See all',
-                        onAction: () => _goToTab(1),
-                      ),
-                      const SizedBox(height: 10),
-                      ...previewPrograms.map(
-                        (program) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: ProgramCard(
-                            program: program,
-                            compact: true,
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ProgramDetailsScreen(
-                                    programId: program.id,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                      // Recent Announcements Section
+                      const Text(
+                        'Recent Announcements',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 16),
-
-                      SectionHeader(
-                        title: 'Announcements',
-                        actionLabel: 'See all',
-                        onAction: () => _goToTab(3),
-                      ),
                       const SizedBox(height: 10),
-                      if (previewAnnouncements.isEmpty)
+                      if (recentAnnouncements.isEmpty)
                         const Text(
                           'No announcements yet.',
                           style: TextStyle(
@@ -254,43 +257,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         )
                       else
-                        AppCard(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            children: previewAnnouncements
-                                .map(
-                                  (a) => AnnouncementCard(
-                                    announcement: a,
-                                    compact: true,
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: recentAnnouncements.length,
+                          separatorBuilder: (context, index) => const Divider(
+                            color: AppColors.divider,
+                            height: 16,
+                          ),
+                          itemBuilder: (context, index) {
+                            final ann = recentAnnouncements[index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        ann.title,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      ann.date,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.textLight,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  ann.content,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
                                   ),
-                                )
-                                .toList(),
-                          ),
-                        ),
-                      const SizedBox(height: 16),
-
-                      SectionHeader(
-                        title: 'Upcoming Tasks',
-                        actionLabel: 'See all',
-                        onAction: () => _goToTab(2),
-                      ),
-                      const SizedBox(height: 10),
-                      if (pendingTasks.isEmpty)
-                        const Text(
-                          'All caught up! No pending tasks.',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 13,
-                          ),
-                        )
-                      else
-                        ...pendingTasks.map(
-                          (task) => TaskTile(
-                            task: task,
-                            compact: true,
-                            onToggle: () =>
-                                db.toggleTaskCompletion(task.id),
-                          ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                     ],
                   ),
@@ -300,6 +314,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildQuickLink({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: (MediaQuery.of(context).size.width - 56) / 4,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: AppColors.primary,
+              size: 24,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

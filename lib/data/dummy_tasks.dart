@@ -8,6 +8,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Environment Setup',
       isCompleted: true,
       programId: 'prog_1',
+      dueDate: 'In 2 days',
     ),
     TaskModel(
       id: 'task_2',
@@ -15,6 +16,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Profile Creation',
       isCompleted: true,
       programId: 'prog_1',
+      dueDate: 'In 5 days',
     ),
     TaskModel(
       id: 'task_3',
@@ -22,6 +24,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Week 1 Assignment',
       isCompleted: false,
       programId: 'prog_1',
+      dueDate: 'In 1 week',
     ),
     TaskModel(
       id: 'task_4',
@@ -29,6 +32,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Week 2 Assignment',
       isCompleted: false,
       programId: 'prog_1',
+      dueDate: 'In 2 weeks',
     ),
     TaskModel(
       id: 'task_5',
@@ -36,6 +40,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Mentor Session',
       isCompleted: false,
       programId: 'prog_1',
+      dueDate: 'In 3 weeks',
     ),
 
     // User 2 (Sneha)
@@ -45,6 +50,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Environment Setup',
       isCompleted: true,
       programId: 'prog_2',
+      dueDate: 'In 2 days',
     ),
     TaskModel(
       id: 'task_7',
@@ -52,6 +58,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Profile Creation',
       isCompleted: false,
       programId: 'prog_2',
+      dueDate: 'In 5 days',
     ),
     TaskModel(
       id: 'task_8',
@@ -59,6 +66,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Week 1 Assignment',
       isCompleted: false,
       programId: 'prog_2',
+      dueDate: 'In 1 week',
     ),
     TaskModel(
       id: 'task_9',
@@ -66,6 +74,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Week 2 Assignment',
       isCompleted: false,
       programId: 'prog_2',
+      dueDate: 'In 2 weeks',
     ),
     TaskModel(
       id: 'task_10',
@@ -73,6 +82,7 @@ List<TaskModel> getDummyTasks() {
       title: 'Mentor Session',
       isCompleted: false,
       programId: 'prog_2',
+      dueDate: 'In 3 weeks',
     ),
   ];
 }

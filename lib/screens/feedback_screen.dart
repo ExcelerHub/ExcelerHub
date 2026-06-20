@@ -19,9 +19,10 @@ class FeedbackScreen extends StatefulWidget {
 
 class _FeedbackScreenState extends State<FeedbackScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _feedbackController = TextEditingController();
+  final _learnController = TextEditingController();
   final _suggestionsController = TextEditingController();
-  int _rating = 4;
+  final _commentsController = TextEditingController();
+  int _rating = 5;
   bool _isLoading = false;
 
   void _submitFeedback() {
@@ -35,8 +36,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         if (user == null) return;
 
         final combinedComments = [
-          'Feedback: ${_feedbackController.text.trim()}',
+          'What did you learn?: ${_learnController.text.trim()}',
           'Suggestions: ${_suggestionsController.text.trim()}',
+          'Comments: ${_commentsController.text.trim()}',
         ].join('\n\n');
 
         final feedback = FeedbackModel(
@@ -44,7 +46,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           programName: widget.programName,
           rating: _rating.toDouble(),
           comments: combinedComments,
-          timestamp: 'June 14, 2026',
+          timestamp: 'June 16, 2026',
         );
 
         MockDatabase.instance.submitFeedback(feedback);
@@ -52,7 +54,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Thank you for your feedback.'),
+            content: Text('Thank you! Feedback submitted successfully.'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -64,8 +66,9 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
 
   @override
   void dispose() {
-    _feedbackController.dispose();
+    _learnController.dispose();
     _suggestionsController.dispose();
+    _commentsController.dispose();
     super.dispose();
   }
 
@@ -106,6 +109,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                
+                // 5 Star Rating
                 const Text(
                   'Rating',
                   style: TextStyle(
@@ -121,7 +126,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     final starValue = index + 1;
                     return IconButton(
                       iconSize: 36,
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
                       icon: Icon(
                         _rating >= starValue
                             ? Icons.star_rounded
@@ -133,34 +138,38 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   }),
                 ),
                 const SizedBox(height: 20),
+
+                // What did you learn?
                 const Text(
-                  'Your Feedback',
+                  'What did you learn?',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
-                  controller: _feedbackController,
-                  maxLines: 4,
-                  minLines: 3,
+                  controller: _learnController,
+                  maxLines: 3,
+                  minLines: 2,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Please share your feedback';
+                      return 'Please share what you learned';
                     }
                     return null;
                   },
                   decoration: const InputDecoration(
-                    hintText: 'What did you learn from this program?',
+                    hintText: 'Describe key learnings and concepts...',
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Suggestions for improvement
                 const Text(
-                  'Suggestions',
+                  'Suggestions for improvement',
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
@@ -171,10 +180,32 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   maxLines: 3,
                   minLines: 2,
                   decoration: const InputDecoration(
-                    hintText: 'How can we improve this program?',
+                    hintText: 'How can we make this program better?',
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Additional Comments
+                const Text(
+                  'Additional Comments',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _commentsController,
+                  maxLines: 3,
+                  minLines: 2,
+                  decoration: const InputDecoration(
+                    hintText: 'Any other thoughts or remarks...',
                   ),
                 ),
                 const SizedBox(height: 28),
+
+                // Submit Button
                 CustomButton(
                   text: 'Submit Feedback',
                   isLoading: _isLoading,
