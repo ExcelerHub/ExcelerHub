@@ -13,11 +13,12 @@ import '../data/dummy_feedback.dart';
 
 class MockDatabase extends ChangeNotifier {
   // Singleton Pattern
-  MockDatabase._internal() {
-    _initData();
-  }
+MockDatabase._internal();
   static final MockDatabase instance = MockDatabase._internal();
   factory MockDatabase() => instance;
+
+  bool _isLoaded = false;
+  bool get isLoaded => _isLoaded;
 
   // In-Memory Collections
   final List<UserModel> _users = [];
@@ -26,13 +27,16 @@ class MockDatabase extends ChangeNotifier {
   final List<AnnouncementModel> _announcements = [];
   final List<FeedbackModel> _feedbacks = [];
 
-  // Initialize data from dummy files
-  void _initData() {
+  // Initialize data from JSON and dummy files
+  Future<void> init() async {
+    if (_isLoaded) return;
     _users.addAll(getDummyUsers());
-    _programs.addAll(getDummyPrograms());
+    _programs.addAll(await getDummyPrograms()); // loads from JSON
     _tasks.addAll(getDummyTasks());
     _announcements.addAll(getDummyAnnouncements());
     _feedbacks.addAll(getDummyFeedback());
+    _isLoaded = true;
+    notifyListeners();
   }
 
   // Getters

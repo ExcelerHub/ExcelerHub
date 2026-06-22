@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 import '../utils/constants.dart';
 import 'login_screen.dart';
+import '../services/mock_database.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,6 +12,9 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  String _statusText = 'Loading programs...';
+
+  
   @override
   void initState() {
     super.initState();
@@ -18,14 +22,21 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToNext() async {
-    await Future.delayed(const Duration(seconds: 2));
+    final minimumDelay = Future.delayed(const Duration(seconds: 2));
+    try {
+      await MockDatabase.instance.init();
+    } catch (e) {
+      if (mounted) {
+        setState(() => _statusText = 'Could not load data');
+      }
+    }
+    await minimumDelay;
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,0 +1,70 @@
+{
+  "programs": [
+    {
+      "id": "prog_1",
+      "title": "Flutter Development Internship",
+      "duration": "12 Weeks",
+      "description": "Master cross-platform mobile development using Flutter and Dart. Build real-world apps with state management, clean architecture, and responsive designs.",
+      "startDate": "July 1, 2026",
+      "eligibility": "Open to Computer Science students and developers with basic coding knowledge.",
+      "skills": ["Flutter", "Dart", "Clean Architecture", "State Management", "REST APIs", "Git"],
+      "mentor": "Sarah Jenkins",
+      "joinedUsers": []
+    },
+    {
+      "id": "prog_2",
+      "title": "AI & Machine Learning Program",
+      "duration": "16 Weeks",
+      "description": "Explore neural networks, natural language processing, and deep learning algorithms.",
+      "startDate": "July 15, 2026",
+      "eligibility": "Basic knowledge of Python, Linear Algebra, and Calculus.",
+      "skills": ["Python", "TensorFlow", "PyTorch", "NLP", "Data Processing"],
+      "mentor": "Dr. Aaron Chen",
+      "joinedUsers": []
+    },
+    {
+      "id": "prog_3",
+      "title": "Full Stack Development Track",
+      "duration": "14 Weeks",
+      "description": "Become a full-stack engineer. Build scalable backend systems with Node.js and robust frontends using React.",
+      "startDate": "August 1, 2026",
+      "eligibility": "Prior understanding of HTML, CSS, and basic JavaScript.",
+      "skills": ["React", "Node.js", "Express", "MongoDB", "SQL", "Docker"],
+      "mentor": "Marcus Lee",
+      "joinedUsers": []
+    },
+    {
+      "id": "prog_4",
+      "title": "Cybersecurity Internship",
+      "duration": "10 Weeks",
+      "description": "Deep dive into network security, ethical hacking, and vulnerability scanning.",
+      "startDate": "August 10, 2026",
+      "eligibility": "Understanding of computer networking concepts.",
+      "skills": ["Ethical Hacking", "Wireshark", "Network Security", "Linux"],
+      "mentor": "Elena Rostova",
+      "joinedUsers": []
+    },
+    {
+      "id": "prog_5",
+      "title": "Data Science Bootcamp",
+      "duration": "12 Weeks",
+      "description": "Extract knowledge and insights from structured and unstructured data.",
+      "startDate": "September 1, 2026",
+      "eligibility": "Enthusiasm for data analysis. No hard coding prerequisite.",
+      "skills": ["Python", "Pandas", "Matplotlib", "SQL", "Tableau"],
+      "mentor": "Kenji Sato",
+      "joinedUsers": []
+    },
+    {
+      "id": "prog_6",
+      "title": "UI/UX Design Program",
+      "duration": "8 Weeks",
+      "description": "Master the user experience design process from research to prototyping.",
+      "startDate": "June 1, 2026",
+      "eligibility": "Creative mindset and passion for digital product design.",
+      "skills": ["Figma", "Wireframing", "User Research", "Typography", "Prototyping"],
+      "mentor": "Sofia Al-Fayed",
+      "joinedUsers": []
+    }
+  ]
+}

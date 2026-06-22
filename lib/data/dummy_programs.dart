@@ -1,114 +1,15 @@
+import 'dart:convert';
+import 'package:flutter/services.dart' show rootBundle;
 import '../models/program_model.dart';
 
-List<ProgramModel> getDummyPrograms() {
-  return [
-    ProgramModel(
-      id: 'prog_1',
-      title: 'Flutter Development Internship',
-      duration: '12 Weeks',
-      description: 'Master cross-platform mobile development using Flutter and Dart. Build real-world apps with state management, clean architecture, and responsive designs.',
-      startDate: 'July 1, 2026',
-      eligibility: 'Open to Computer Science students and developers with basic coding knowledge.',
-      skills: ['Flutter', 'Dart', 'Clean Architecture', 'State Management', 'REST APIs', 'Git'],
-      learningOutcomes: [
-        'Build production-ready Flutter apps for Android and iOS',
-        'Implement clean architecture and state management patterns',
-        'Integrate REST APIs and handle offline-first data flows',
-        'Deploy apps following Material Design guidelines',
-      ],
-      mentor: 'Sarah Jenkins (Senior Mobile Lead)',
-      joinedUsers: ['user_1'],
-      imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop',
-    ),
-    ProgramModel(
-      id: 'prog_2',
-      title: 'AI & Machine Learning Program',
-      duration: '16 Weeks',
-      description: 'Explore neural networks, natural language processing, and deep learning algorithms. Work on practical model training using TensorFlow and PyTorch.',
-      startDate: 'July 15, 2026',
-      eligibility: 'Basic knowledge of Python, Linear Algebra, and Calculus.',
-      skills: ['Python', 'TensorFlow', 'PyTorch', 'Supervised Learning', 'NLP', 'Data Processing'],
-      learningOutcomes: [
-        'Train and evaluate machine learning models on real datasets',
-        'Apply NLP techniques to text classification problems',
-        'Understand neural network architectures and optimization',
-        'Present model results with clear metrics and visualizations',
-      ],
-      mentor: 'Dr. Aaron Chen (AI Researcher)',
-      joinedUsers: ['user_2'],
-      imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?q=80&w=600&auto=format&fit=crop',
-    ),
-    ProgramModel(
-      id: 'prog_3',
-      title: 'Full Stack Development Track',
-      duration: '14 Weeks',
-      description: 'Become a full-stack engineer. Build scalable backend systems with Node.js and SQL/NoSQL databases, and robust frontends using React and modern CSS.',
-      startDate: 'August 1, 2026',
-      eligibility: 'Prior understanding of HTML, CSS, and basic JavaScript loops.',
-      skills: ['React', 'Node.js', 'Express', 'MongoDB', 'SQL', 'Docker', 'RESTful Design'],
-      learningOutcomes: [
-        'Design and build RESTful APIs with Node.js and Express',
-        'Create responsive React frontends with modern UI patterns',
-        'Model data in SQL and NoSQL databases',
-        'Containerize applications using Docker basics',
-      ],
-      mentor: 'Marcus Aurelius (Full Stack Architect)',
-      joinedUsers: ['user_1'],
-      imageUrl: 'https://images.unsplash.com/photo-1547082299-de196ea013d6?q=80&w=600&auto=format&fit=crop',
-    ),
-    ProgramModel(
-      id: 'prog_4',
-      title: 'Cybersecurity Internship',
-      duration: '10 Weeks',
-      description: 'Deep dive into network security, ethical hacking, vulnerability scanning, and threat intelligence. Protect digital systems and construct defensive postures.',
-      startDate: 'August 10, 2026',
-      eligibility: 'Understanding of computer networking concepts (TCP/IP, OSI model).',
-      skills: ['Ethical Hacking', 'Wireshark', 'Metasploit', 'Network Security', 'Firewalls', 'Linux'],
-      learningOutcomes: [
-        'Identify common vulnerabilities in web and network systems',
-        'Perform ethical penetration testing in controlled environments',
-        'Configure firewalls and security monitoring tools',
-        'Document security findings and remediation recommendations',
-      ],
-      mentor: 'Elena Rostova (Cyber Security Architect)',
-      joinedUsers: [],
-      imageUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=600&auto=format&fit=crop',
-    ),
-    ProgramModel(
-      id: 'prog_5',
-      title: 'Data Science Bootcamp',
-      duration: '12 Weeks',
-      description: 'Extract knowledge and insights from structured and unstructured data. Learn data visualization, statistical modeling, and data manipulation techniques.',
-      startDate: 'September 1, 2026',
-      eligibility: 'Enthusiasm for data analysis. No hard coding prerequisite.',
-      skills: ['R', 'Python', 'Pandas', 'Matplotlib', 'SQL', 'Data Analytics', 'Tableau'],
-      learningOutcomes: [
-        'Clean and transform raw data for analysis pipelines',
-        'Build statistical models and interpret results accurately',
-        'Create compelling data visualizations and dashboards',
-        'Communicate data-driven insights to non-technical stakeholders',
-      ],
-      mentor: 'Kenji Sato (Lead Data Scientist)',
-      joinedUsers: [],
-      imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop',
-    ),
-    ProgramModel(
-      id: 'prog_6',
-      title: 'UI/UX Design Program',
-      duration: '8 Weeks',
-      description: 'Master the user experience design process from research to prototyping. Learn Figma, wireframing, user persona development, and high-fidelity testing.',
-      startDate: 'June 1, 2026',
-      eligibility: 'Creative mindset and passion for digital product interface designs.',
-      skills: ['Figma', 'Wireframing', 'User Research', 'Typography', 'Color Theory', 'Prototyping'],
-      learningOutcomes: [
-        'Conduct user research and create actionable personas',
-        'Design wireframes and high-fidelity prototypes in Figma',
-        'Apply typography, color theory, and accessibility principles',
-        'Validate designs through usability testing sessions',
-      ],
-      mentor: 'Sofia Al-Fayed (Lead Product Designer)',
-      joinedUsers: ['user_1'],
-      imageUrl: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?q=80&w=600&auto=format&fit=crop',
-    ),
-  ];
+/// Loads the program catalog from assets/data/programs.json.
+/// Week 3: real data from a sample JSON file instead of hardcoded list.
+Future<List<ProgramModel>> getDummyPrograms() async {
+  final jsonString = await rootBundle.loadString('assets/data/programs.json');
+  final Map<String, dynamic> jsonMap = json.decode(jsonString);
+  final List<dynamic> programsJson = jsonMap['programs'];
+
+  return programsJson
+      .map((item) => ProgramModel.fromMap(item as Map<String, dynamic>))
+      .toList();
 }
