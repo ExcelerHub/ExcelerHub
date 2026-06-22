@@ -6,7 +6,7 @@ import '../models/announcement_model.dart';
 import '../models/feedback_model.dart';
 
 import '../data/dummy_users.dart';
-import '../data/dummy_programs.dart';
+import 'mock_api_service.dart';
 import '../data/dummy_tasks.dart';
 import '../data/dummy_announcements.dart';
 import '../data/dummy_feedback.dart';
@@ -27,11 +27,11 @@ MockDatabase._internal();
   final List<AnnouncementModel> _announcements = [];
   final List<FeedbackModel> _feedbacks = [];
 
-  // Initialize data from JSON and dummy files
+  // Initialize data — programs fetched via MockApiService (Week 3: mock API)
   Future<void> init() async {
     if (_isLoaded) return;
     _users.addAll(getDummyUsers());
-    _programs.addAll(await getDummyPrograms()); // loads from JSON
+    _programs.addAll(await MockApiService.instance.fetchPrograms());
     _tasks.addAll(getDummyTasks());
     _announcements.addAll(getDummyAnnouncements());
     _feedbacks.addAll(getDummyFeedback());

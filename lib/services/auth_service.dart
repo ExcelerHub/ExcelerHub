@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import 'mock_database.dart';
+import 'local_storage_service.dart';
 
 class AuthService extends ChangeNotifier {
-  // Singleton Pattern
   AuthService._internal() {
-    // Listen to mock database changes to keep currentUser session in sync
     MockDatabase.instance.addListener(_syncUserSession);
   }
   static final AuthService instance = AuthService._internal();
@@ -19,22 +18,27 @@ class AuthService extends ChangeNotifier {
   void _syncUserSession() {
     if (_currentUser != null) {
       try {
-        final dbUser = MockDatabase.instance.users.firstWhere((u) => u.id == _currentUser!.id);
+        final dbUser = MockDatabase.instance.users
+            .firstWhere((u) => u.id == _currentUser!.id);
         _currentUser = dbUser;
         notifyListeners();
       } catch (_) {
-        // user was deleted or not found
         _currentUser = null;
         notifyListeners();
       }
     }
   }
 
-  // Login
-  bool login(String email, String password) {
+  // Login — saves session to local storage
+  Future<bool> login(String email, String password) async {
     final user = MockDatabase.instance.authenticateUser(email, password);
     if (user != null) {
       _currentUser = user;
+      await LocalStorageService.instance.saveUserSession(
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+      );
       notifyListeners();
       return true;
     }
@@ -47,16 +51,18 @@ class AuthService extends ChangeNotifier {
     return user != null;
   }
 
-  // Logout
-  void logout() {
+  // Logout — clears local storage session
+  Future<void> logout() async {
     _currentUser = null;
+    await LocalStorageService.instance.clearSession();
     notifyListeners();
   }
 
-  // Manual update profile
+  // Update profile
   bool updateProfile(String name, String email) {
     if (_currentUser == null) return false;
-    final updated = MockDatabase.instance.updateUserProfile(_currentUser!.id, name, email);
+    final updated = MockDatabase.instance
+        .updateUserProfile(_currentUser!.id, name, email);
     if (updated != null) {
       _currentUser = updated;
       notifyListeners();
