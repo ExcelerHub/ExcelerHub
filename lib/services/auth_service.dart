@@ -46,8 +46,9 @@ class AuthService extends ChangeNotifier {
   }
 
   // Register
-  bool register(String name, String email, String password) {
-    final user = MockDatabase.instance.registerUser(name, email, password);
+  // Register — now async to save user to local storage
+  Future<bool> register(String name, String email, String password) async {
+    final user = await MockDatabase.instance.registerUser(name, email, password);
     return user != null;
   }
 
